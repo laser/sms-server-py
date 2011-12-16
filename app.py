@@ -190,9 +190,6 @@ def __save_file_to_cloud(file):
 ########
 
 if __name__ == '__main__':
-    if (os.environ['VIRTUAL_ENV'] != "/mnt/hgfs/erinswensonhealey.com/map"):
-        log_fmt = '%(asctime)s\t%(threadName)s\t%(name)s\t%(levelname)s\t%(message)s'
-        logging.basicConfig(format=log_fmt)
     debug = bool(dict_get(os.environ, "ENEE_DEBUG"))
     host  = dict_get(os.environ, "ENEE_HOST")
     port  = int(dict_get(os.environ, "ENEE_PORT"))
