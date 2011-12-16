@@ -7,8 +7,8 @@ from email.Utils import parseaddr, formataddr
 from utilities import dict_get
 import os
 
-gmail_user = dict_get(os.environ, 'ENEE_SMTP_USER')
-gmail_pwd = dict_get(os.environ, 'ENEE_SMTP_PASSWORD')
+smtp_user = dict_get(os.environ, 'ENEE_SMTP_USER')
+smtp_password = dict_get(os.environ, 'ENEE_SMTP_PASSWORD')
 smtp_server = dict_get(os.environ, 'ENEE_SMTP_SERVER')
 smtp_port = dict_get(os.environ, 'ENEE_SMTP_PORT')
 
@@ -51,6 +51,6 @@ def mail(to, cc, bcc, subject, text):
     smtp.ehlo()
     smtp.starttls()
     smtp.ehlo()
-    smtp.login(gmail_user, gmail_pwd)
+    smtp.login(smtp_user, smtp_password)
     smtp.sendmail(gmail_user, toaddrs, msg.as_string())
     smtp.close()
