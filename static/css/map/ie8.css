@@ -1,0 +1,8 @@
+body .ui-button .ui-button-text {
+    line-height: 1.3em;
+    padding-top: .3em;
+}
+
+body .fake-select-wrapper > a > span.ui-button-text {
+    padding-top: .3em;
+}

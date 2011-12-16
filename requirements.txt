@@ -1,0 +1,11 @@
+Flask==0.6.1
+Jinja2==2.5.5
+LEPL==5.0.0
+MySQL-python==1.2.3
+Werkzeug==0.6.2
+functools==0.5
+httplib2==0.7.1
+oauth2==1.5.170
+python-cloudfiles==1.7.9.1
+uuid==1.30
+wsgiref==0.1.2

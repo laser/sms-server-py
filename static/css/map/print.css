@@ -1,0 +1,19 @@
+body {
+    
+}
+
+body .private #map_canvas, body .public #map_canvas {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+#map_canvas > div > div:nth-last-child(-n+4) {
+    display: none;
+}
+
+.landing-page-control-holder {
+    display: none;
+}

@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="public" id="page"></div>
+<div id="temp"></div>
+<script type="text/javascript">
+    jQuery(function() {
+        Util.loadLanguageFile(function() {
+            var el,
+                controller,
+                service,
+                modal,
+                mask;
+
+            mask = new Mask(function() {
+                modal = new Modal(function(modal) {
+                    el         = document.getElementById("page");
+                    service    = new Service();
+                    controller = new LandingPageBaseController(service, modal, el);
+
+                    controller.projectId = {{ public['project_id']|tojson|safe }};
+                    controller.userSettings = {
+                        default_language: {{ public['default_language']|tojson|safe }},
+                        default_gps_format: {{ public['default_gps_format']|tojson|safe }},
+                        default_measurement_system: {{ public['default_measurement_system']|tojson|safe }},
+                        default_google_map_type: {{ public['default_google_map_type']|tojson|safe }}
+                    };
+                    controller.start();
+                }, null, null);
+            });
+        }, {{ public['default_language']|tojson|safe }});
+    });
+</script>
+{% endblock %}

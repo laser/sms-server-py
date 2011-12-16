@@ -1,0 +1,672 @@
+/************************************
+ generic stuff
+*/
+
+body {
+    background-color: black;
+    font-family: Verdana,Arial,sans-serif;
+    font-size: 0.9em;
+    overflow: hidden;
+}
+
+button {
+    margin: 0;
+}
+
+*:focus {
+    outline: none;
+}
+
+.callOut {
+    background-color: white;
+    border: 1px solid red;
+    color: red;
+    font-size: 8px;
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+
+    /* Theoretically for IE 8 & 9 (more valid) */
+    /* ...but not required as filter works too */
+    /* should come BEFORE filter */
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+
+    /* This works in IE 8 & 9 too */
+    /* ... but also 5, 6, 7 */
+    filter: alpha(opacity=75);
+
+    /* Older than Firefox 0.9 */
+    -moz-opacity:0.75;
+
+    /* Safari 1.x (pre WebKit!) */
+    -khtml-opacity: 0.75;
+
+    /* Modern!
+    /* Firefox 0.9+, Safari 2?, Chrome any?
+    /* Opera 9+, IE 9+ */
+    opacity: 0.75;
+}
+
+.callOut li {
+    padding: 0.5em;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+}
+
+table thead tr th {
+    background: url("../dark-hive/images/ui-bg_highlight-soft_33_003147_1x100.png") repeat-x scroll 50% 50% #003147;
+    border: 1px solid #444444;
+    color: #ffffff;
+    outline: medium none;
+    padding: 3px 10px;
+    text-align: left;
+}
+
+table tbody tr td {
+    border: 1px solid #c0c0c0;
+    color: #444444;
+    padding: 3px 10px;
+}
+
+table tbody tr.even {
+    background-color: #dbf4fe;
+}
+
+
+table tbody tr.odd {
+    background-color: #edfaff;
+}
+
+/************************************
+ dialog implementation
+*/
+
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset .left {
+    float: left;
+}
+
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset .right {
+    float: right;
+}
+
+.ui-dialog.wait .ui-dialog-titlebar {
+    /*display: none;*/
+}
+
+.ui-dialog.wait .ui-dialog-content {
+    padding: 0.5em 0.5em;
+}
+
+/**********************************
+ the fake text-element plugin style
+*/
+
+.fake-text-wrapper {
+    background-color: white;
+    border: 1px solid #444444;
+    padding: 0.55em;
+    position: relative;
+}
+
+.fake-text-wrapper > .hint {
+    color: #9e9e9e;
+    position: absolute;
+}
+
+.fake-text-wrapper > .hint.symbol {
+    right: 0.3em;
+    top: 0.2em;
+}
+
+.fake-text-wrapper > .hint.text {
+    left: 0.6em;
+    top: 0.55em;
+}
+
+.fake-text-wrapper > input {
+    border: 0;
+    color: #444;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.fake-text-wrapper > textarea {
+    border: 0;
+    color: #444;
+    margin: 0;
+    overflow-y: auto;
+    padding: 0;
+    resize: none;
+    width: 100%;
+}
+
+body .ui-widget .ui-widget.small {
+    font-size: 0.7em;
+}
+
+/************************************
+ the fake select-element plugin thing
+*/
+
+.fake-select-wrapper {
+    display: inline-block;
+}
+
+.fake-select-wrapper > a {
+
+}
+
+.fake-select-wrapper > a > span.ui-button-text {
+    overflow: hidden;
+    margin: 0 3.5em 0 1em;
+    padding: 0.4em 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+}
+
+.fake-select-wrapper.small > a > .ui-button-text {
+    font-size: 0.5em;
+    margin: 0 5em 0 1em;
+    padding: 1.2em 0;
+}
+
+.fake-select-wrapper > ul {
+    background: none repeat scroll 0 0 #FFFFFF;
+    -moz-box-shadow: 0 0 6px rgba(0, 0, 0, 0.5), 0 6px 8px -8px rgba(0, 0, 0, 0.5) inset;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.5), 0 6px 8px -8px rgba(0, 0, 0, 0.5) inset;
+    display: none;
+    list-style: none outside none;
+    margin: 5px 0 0;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 2px 0;
+    position: fixed;
+    z-index: 100;
+}
+.fake-select-wrapper > ul > li {
+    font-size: 0.9em;
+    list-style: none outside none;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.fake-select-wrapper > ul > li > a {
+    color: #666666;
+    cursor: pointer;
+    display: block;
+    font-size: 0.75em;
+    font-weight: normal;
+    line-height: 1.6em;
+    padding: 1em;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.fake-select-wrapper > ul > li > a.selected, .fake-select-wrapper > ul > li > a:hover {
+    background-color: #0f7fcf;
+    color: #FFFFFF;
+}
+
+.fake-select-wrapper .ui-button.fake-select {
+    background-image: url("../map/images/ui-fake_select-bg_ready.png");
+    background-position: right;
+    margin-right: 0;
+    width: 100%;
+}
+
+.fake-select-wrapper .ui-button.fake-select:hover {
+    background-image: url("../map/images/ui-fake_select-bg_hover.png");
+}
+
+ul.field-list {
+    margin: 0;
+    padding: 0;
+}
+
+ul.field-list > li {
+    float: left;
+    list-style: none;
+    margin: 0 0 .5em 1%;
+    width: 49%;
+}
+
+ul.field-list > li.new-line {
+    clear: left;
+    margin: 0 1% .5em 0;
+    width: 49%;
+}
+
+ul.field-list > li.new-line.full-width {
+    clear: both;
+    margin: 0 0 .5em;
+    width: 100%;
+}
+
+ul.field-list > li > label {
+    display: block;
+    line-height: 1.9em;
+}
+
+ul.field-list > li > .fake-select-wrapper {
+    width: 100%;
+}
+
+ul.field-list > li > .fake-select-wrapper > a {
+    width: 100%;
+}
+
+ul.field-list > li.degree > .fake-text-wrapper,
+ul.field-list > li.utm > .fake-text-wrapper {
+    float: left;
+    margin-right: 10px;
+    width: 2.8em;
+}
+
+ul.field-list > li.degree > .degree {
+    /*width: 2em;*/
+}
+
+ul.field-list > li.degree > .minute {
+    width: 1.8em;
+}
+
+ul.field-list > li.degree > .second {
+    width: 4.0em;
+}
+
+ul.field-list > li.degree > .fake-select-wrapper {
+    width: 6.3em;
+}
+
+ul.field-list > li.utm > .x {
+    width: 10em;
+}
+
+ul.field-list > li.utm > .y {
+    width: 10em;
+}
+
+ul.field-list > li.utm > .latitude-zone,
+ul.field-list > li.utm > .longitude-zone
+{
+    width: 8.9em;
+}
+
+ul.field-list > li.utm > .longitude-zone {
+    margin-left: 10px;
+}
+
+ul.field-list > li.image-single object,
+ul.field-list > li.image-multi object
+{
+    float: left;
+    height: 40px;
+}
+
+ul.field-list > li.image-multi .done,
+ul.field-list > li.image-single .done
+{
+    background: url("../dark-hive/images/ui-bg_highlight-soft_35_222222_1x100.png") repeat-x scroll 50% 50% #222222;
+    color: #EEEEEE;
+    display: inline;
+    float: left;
+    height: 16px;
+    padding: 4px 0 10px 16px;
+    width: 104px;
+}
+
+ul.field-list > li.image-multi a.already_uploaded {
+    clear: left;
+    display: block;
+    font-size: 0.8em;
+}
+
+ul.field-list > li.custom ul.icons {
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+}
+
+ul.field-list > li.custom ul.icons > li {
+    height: 37px;
+    float: left;
+    line-height: 12px;
+    list-style: none;
+    margin: 1px 4px 1px 1px;
+    text-align: center;
+    width: 32px;
+}
+
+ul.field-list > li.custom ul.icons > li:hover {
+    border: 1px solid gray;
+    margin: 0 3px 0 0;
+}
+
+ul.field-list > li.custom ul.icons > li.selected {
+    background-color: black;
+    border: 1px solid gray;
+    margin: 0 3px 0 0;
+}
+
+ul.field-list > li.custom ul.icons > li.selected:hover {
+    border: 1px solid #eaeaea;
+}
+
+/************************************
+ landing page
+*/
+
+.landing-page-control-holder {
+    left: 20px;
+    position: absolute;
+    z-index: 2;
+}
+
+.landing-page-control-holder.north {
+    padding: 9px 0 0 1em;
+}
+
+.landing-page-control-holder.south {
+    bottom: 0;
+    padding: 0 6em 9px 1em;
+}
+
+.landing-page-control-holder > * {
+    float: left;
+}
+
+.landing-page-control-holder > a,
+.landing-page-control-holder > #new_project_shim,
+.landing-page-control-holder > #search_shim,
+.landing-page-control-holder > #add-positions {
+    margin-right: 10px;
+}
+
+.landing-page-control-holder > #search_shim > a {
+    margin-right: 0;
+}
+
+.landing-page-control-holder > #new_project_shim {
+    width: 18em;
+}
+
+.landing-page-control-holder #select-project {
+    width: 100%;
+}
+
+.landing-page-control-holder > #select-project > a {
+    width: 100%;
+    z-index: 1;
+}
+
+.landing-page-control-holder #new_project_input_shim,
+.landing-page-control-holder #search_input_shim {
+    display: none;
+}
+
+.landing-page-control-holder #new_project,
+.landing-page-control-holder #search {
+    font-size: 1em;
+}
+
+
+.landing-page-control-holder #search_public {
+    min-width: 9em;
+}
+
+body #map_canvas {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 54px;
+}
+
+body .private #map_canvas {
+    bottom: 54px;
+    height: auto;
+}
+
+body .public #map_canvas {
+    height: auto;
+}
+
+/************************************
+ welcome / login modal
+*/
+
+.welcome {
+
+}
+
+.welcome .ui-dialog-content > div {
+    padding: 1em 0 0 0;
+    position: relative;
+}
+
+.welcome .ui-dialog-content > div > div {    
+    text-align: center;
+}
+
+.welcome .ui-dialog-content > div > div > a {
+    margin-bottom: 1em;
+}
+
+.welcome .ui-dialog-content > div > div > a:first-child {
+    margin-top: 7em;
+}
+
+/************************************
+ manage custom fields modal
+*/
+
+.manageCustomFields {
+
+}
+
+.manageCustomFields .ui-dialog-content > div {
+    padding: 1em 0 0 0;
+    position: relative;
+}
+
+.manageCustomFields .ui-dialog-content > div > #new_custom_field_shim > a.ui-button {
+
+}
+
+.manageCustomFields .ui-dialog-content > div > #new_custom_field_shim > #new_custom_field_inputSelect_wrapper {
+    display: none;
+}
+
+.manageCustomFields .ui-dialog-content > div > table {
+    position: absolute;
+    top: 6.6em;
+}
+
+.manageCustomFields .ui-dialog-content > div > table thead tr th.position_field_id,
+.manageCustomFields .ui-dialog-content > div > table tbody tr td.position_field_id {
+    text-align: center;
+}
+
+/************************************
+ manage permissions modal
+*/
+
+.fake-text-wrapper > .access-list {
+    border: 0;
+    color: #444;
+    margin: 0;
+    min-height: 24px;
+    padding: 0;
+    width: 100%;
+}
+
+.fake-text-wrapper > .access-list .access {
+    float: left;
+    font-family: monospace;
+    font-size: 1em;
+    padding: 3px 5px;
+    margin: 0 5px 5px 0;
+}
+
+.fake-text-wrapper > .access-list .access.public {
+    border: 1px dotted green;
+}
+
+.fake-text-wrapper > .access-list .access.email {
+    border: 1px dotted #0093d8;
+}
+
+.fake-text-wrapper > .access-list .access:hover {
+    color: white;
+    cursor: pointer;
+}
+
+.fake-text-wrapper > .access-list .access.email:hover {
+    background-color: #0093d8;
+    border: 1px dotted #0093d8;
+}
+
+.fake-text-wrapper > .access-list .access.public:hover {
+    background-color: green;
+    border: 1px dotted green;
+}
+
+ul.field-list > li.custom.textarea.access {
+    border-bottom: 1px solid red;
+    padding-bottom: 0.6em;
+}
+
+ul.field-list > li.custom.textarea.access > .fake-text-wrapper {
+    height: 3em;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+ul.field-list > li.custom.textarea.enter_emails > .fake-text-wrapper > textarea,
+ul.field-list > li.custom.textarea.greeting > .fake-text-wrapper > textarea {
+    height: 37px;
+}
+
+ul.field-list > li.custom.textarea.enter_emails > .fake-text-wrapper > textarea {
+    font-family: monospace;
+    font-size: 1em;
+}
+
+ul.field-list > li.custom.readonly.link {
+    display: none;
+}
+
+/************************************
+ import from garmin modal
+*/
+
+.importFromGarmin {
+
+}
+
+.importFromGarmin .ui-dialog-content > div {
+    padding: 1em 0 0 0;
+    position: relative;
+}
+
+.importFromGarmin .ui-dialog-content > div > table {    
+    position: absolute;
+    top: 6.6em;
+}
+
+/************************************
+ infoWindow styles
+*/
+
+table.infowindow {
+    border: 0;
+    margin: 5px 0;
+    width: 100%;
+}
+
+table.infowindow tbody tr td:first-child {
+    white-space: nowrap;
+}
+
+table.infowindow tbody tr td {
+    border: 0;
+    font-size: 10px;
+    padding: 3px 2px;
+    text-align: left;
+    vertical-align: top;
+}
+
+table.infowindow tbody tr td div.box {
+    border: 1px solid #f5f5f5;
+    padding: 6px;
+    position: relative;
+}
+
+table.infowindow tbody tr td div.box label {
+    left: 5px;
+    position: absolute;
+    top: -10px;
+}
+
+table.infowindow tbody tr.IMAGE td,
+table.infowindow tbody tr.IMAGE_LIST td {
+    padding-top: 10px
+}
+
+table.infowindow tbody tr.IMAGE_LIST > td:first-child,
+table.infowindow tbody tr.IMAGE td:first-child {
+    text-align: left;
+}
+
+table.infowindow tbody tr.IMAGE td img {
+    max-height: 500px;
+    width: 200px;
+}
+
+table.infowindow tbody tr.IMAGE_LIST td img {
+    height: 45px;
+}
+
+/************************************
+ console
+*/
+
+textarea.console {
+    border: 1px solid #e0e0e0;
+    display: none;
+    font-family: MONOSPACE;
+    font-size: 1.2em;
+    position: absolute;
+    right: 9px;
+    bottom: 9px;
+    z-index: 150;
+
+    /* Theoretically for IE 8 & 9 (more valid) */
+    /* ...but not required as filter works too */
+    /* should come BEFORE filter */
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+
+    /* This works in IE 8 & 9 too */
+    /* ... but also 5, 6, 7 */
+    filter: alpha(opacity=80);
+
+    /* Older than Firefox 0.9 */
+    -moz-opacity:0.80;
+
+    /* Safari 1.x (pre WebKit!) */
+    -khtml-opacity: 0.80;
+
+    /* Modern!
+    /* Firefox 0.9+, Safari 2?, Chrome any?
+    /* Opera 9+, IE 9+ */
+    opacity: 0.80;
+}

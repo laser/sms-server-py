@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{% block title %}Need to resource bundle me?{% endblock %}
+{% block content %}
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        var node;
+
+        node = document.createElement("input");
+        node.type = "file";
+        node.name = "file_upload";
+        node.id   = "file_upload";
+
+        var dingle = document.getElementById("dingle");
+        var ringle = document.getElementById("ringle");
+
+        $(dingle).append(node);
+
+        $(node).uploadify({
+            'buttonText': "el button",
+            'uploader'  : '../static/js/uploadify-2.0/uploadify.swf',
+            'script'    : 'upload',
+            'cancelImg'  : '../static/js/uploadify-2.0/cancel.png',
+            'auto'      : true,
+            'multi'     : true,
+            scriptData: {
+                user_id: {{ data['user']['user_id']|tojson|safe }}
+            }
+        });
+
+        var z = node.parentNode.parentNode.removeChild(node.parentNode);
+        z.removeAttribute("id");
+        z.removeAttribute("style");
+        ringle.parentNode.replaceChild(z, ringle);
+    });
+</script>
+
+<h2>the form</h2>
+<div id="dingle" style="display: none;"></div>
+        <hr>
+        <div id="ringle"></div>
+
+<h4>already uploaded:</h4>
+<ul>
+    {% for file in data['files'] %}
+        <li><a href="{{ file['uri'] }}">{{ file['uri'] }}</a></li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

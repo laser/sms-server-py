@@ -1,0 +1,1 @@
+ALTER TABLE position_fields CHANGE position_field_id position_field_id int(11) NOT NULL auto_increment;
