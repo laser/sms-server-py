@@ -77,11 +77,7 @@ def show_public_project(project_id, default_language, default_gps_format, defaul
 
 @app.route('/upload', methods=['POST', 'GET'])
 def upload():
-    if request.method == 'POST' and 'Filedata' in request.files:
-        return jsonify(dict(status="success", uri=__save_file_to_cloud(request.files['Filedata'])))
-    else:
-        return render_template('upload.html', data=dict(user=dict(user_id=dict_get(session, 'user_id')), files=cloudFilesService.get_uri_list()))
-
+    return jsonify(dict(status="success", uri=__save_file_to_cloud(request.files['Filedata'])))
 
 @app.route("/favicon.ico")
 def favicon():
