@@ -16,6 +16,10 @@
     <script type="text/javascript">
         $(document).ready(function() {
 
+            var RESOURCE_PATH;
+
+            RESOURCE_PATH = "file:///Users/hippipp/erinswensonhealey.com/simplemappingsystem.com/webapp";
+
             module("Util object");
 
             test("Domain-specific zone enums", function() {
@@ -46,7 +50,7 @@
                     button_search_text_english = "Search Positions";
                     start();
                     equal(sMap.get("button_search"), button_search_text_english, "The default language should be English");
-                }, null, "file:///Users/hippipp/erinswensonhealey.com/simplemappingsystem.com/webapp"); // change as you see fit
+                }, null, RESOURCE_PATH); // change as you see fit
             });
 
             test("Form-related utility functions", function() {
