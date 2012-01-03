@@ -48,6 +48,27 @@
                     equal(sMap.get("button_search"), button_search_text_english, "The default language should be English");
                 }, null, "file:///Users/hippipp/erinswensonhealey.com/simplemappingsystem.com/webapp"); // change as you see fit
             });
+
+            test("Form-related utility functions", function() {
+                var input;
+
+                input = document.createElement("input");
+                input.type = "text";
+                input.name = "sample";
+                jQuery(input).val("1");
+
+                equal(typeof Util.getFormValueTyped(jQuery(input).val()), "number", "Use parseInt and return a native object of type \"number\"");
+                strictEqual(Util.getFormValueTyped(jQuery(input).val()), 1);
+
+                jQuery(input).val("12.43");
+                equal(typeof Util.getFormValueTyped(jQuery(input).val()), "number", "Use parseFloat and return type \"number\"");
+                strictEqual(Util.getFormValueTyped(jQuery(input).val()), 12.43);
+
+
+                jQuery(input).val("12.dingle");
+                equal(typeof Util.getFormValueTyped(jQuery(input).val()), "string", "A native object of type \"string\" should return");
+                strictEqual(Util.getFormValueTyped(jQuery(input).val()), "12.dingle");
+            });
         });
     </script>
 </head>
