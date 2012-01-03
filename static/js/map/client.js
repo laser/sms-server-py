@@ -108,10 +108,6 @@ Util.getHemispheres = function() {
     return ["N", "S"];
 };
 
-Util.loadAssets = function() {
-
-};
-
 Util.loadCss = function() {
     var url,
         callback,

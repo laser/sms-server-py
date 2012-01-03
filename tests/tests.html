@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css" type="text/css" media="screen"/>
+    <script type="text/javascript" src="http://code.jquery.com/qunit/git/qunit.js"></script>
+
+    <!-- stuff i wrote -->
+    <script type="text/javascript" src="../static/js/map/client.js"></script>
+    
+    <!-- misc javascript utils -->
+    <script type="text/javascript" src="../static/js/head.js/head.load.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            module("Util object");
+
+            test("Domain-specific zone enums", function() {
+                var lonZones,
+                    latZones,
+                    hemispheres,
+                    i;
+
+                lonZones = [];
+                for (i = 1; i < 61; i++) {
+                    lonZones.push(i.toString());
+                }
+                deepEqual(Util.getLonZones(), lonZones);
+
+                latZones = ["C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "U", "V", "W", "X"];
+                deepEqual(Util.getLatZones(), latZones);
+
+
+                hemispheres = ["N", "S"];
+                deepEqual(Util.getHemispheres(), hemispheres);
+            });
+
+            test("Test resource-loading code", function() {
+                stop();
+                Util.loadLanguageFile(function() {
+                    var button_search_text_english;
+
+                    button_search_text_english = "Search Positions";
+                    start();
+                    equal(sMap.get("button_search"), button_search_text_english, "The default language should be English");
+                }, null, "file:///Users/hippipp/erinswensonhealey.com/simplemappingsystem.com/webapp"); // change as you see fit
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1 id="qunit-header">QUnit example</h1>
+    <h2 id="qunit-banner"></h2>
+    <div id="qunit-testrunner-toolbar"></div>
+    <h2 id="qunit-userAgent"></h2>
+    <ol id="qunit-tests"></ol>
+    <div id="qunit-fixture">test markup, will be hidden</div>
+</body>
+</html>
