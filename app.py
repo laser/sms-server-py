@@ -14,14 +14,14 @@ import json
 import logging
 
 app = Flask(__name__)
-app.secret_key = dict_get(os.environ, "ENEE_FLASK_SECRET_KEY")
+app.secret_key = dict_get(os.environ, "FLASK_SECRET_KEY")
 
 #################################################################
 # garmin communicator #
 ########**************#
 
-garmin_domain = dict_get(os.environ, "ENEE_GARMIN_DOMAIN")
-garmin_key = dict_get(os.environ, "ENEE_GARMIN_KEY")
+garmin_domain = dict_get(os.environ, "GARMIN_DOMAIN")
+garmin_key = dict_get(os.environ, "GARMIN_KEY")
 
 #################################################################
 # oauth #
@@ -35,8 +35,8 @@ google = oauth.remote_app(
     request_token_url='https://www.google.com/accounts/OAuthGetRequestToken',
     access_token_url='https://www.google.com/accounts/OAuthGetAccessToken',
     authorize_url='https://www.google.com/accounts/OAuthAuthorizeToken',
-    consumer_key=dict_get(os.environ, "ENEE_OAUTH_CONSUMER_KEY"),
-    consumer_secret=dict_get(os.environ, "ENEE_OAUTH_CONSUMER_SECRET"),
+    consumer_key=dict_get(os.environ, "OAUTH_CONSUMER_KEY"),
+    consumer_secret=dict_get(os.environ, "OAUTH_CONSUMER_SECRET"),
     request_token_params =
         {'scope':'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'})
 
@@ -193,7 +193,7 @@ def __save_file_to_cloud(file):
 ########
 
 if __name__ == '__main__':
-    debug = bool(dict_get(os.environ, "ENEE_DEBUG"))
-    host  = dict_get(os.environ, "ENEE_HOST")
-    port  = int(dict_get(os.environ, "ENEE_PORT"))
+    debug = bool(dict_get(os.environ, "DEBUG"))
+    host  = dict_get(os.environ, "HOST")
+    port  = int(dict_get(os.environ, "PORT"))
     app.run(debug=debug, host=host, port=port)

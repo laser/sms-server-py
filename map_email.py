@@ -7,10 +7,10 @@ from email.Utils import parseaddr, formataddr
 from utilities import dict_get
 import os
 
-smtp_user = dict_get(os.environ, 'ENEE_SMTP_USER')
-smtp_password = dict_get(os.environ, 'ENEE_SMTP_PASSWORD')
-smtp_server = dict_get(os.environ, 'ENEE_SMTP_SERVER')
-smtp_port = dict_get(os.environ, 'ENEE_SMTP_PORT')
+smtp_user = dict_get(os.environ, 'SMTP_USER')
+smtp_password = dict_get(os.environ, 'SMTP_PASSWORD')
+smtp_server = dict_get(os.environ, 'SMTP_SERVER')
+smtp_port = dict_get(os.environ, 'SMTP_PORT')
 
 def mail(to, cc, bcc, subject, text):
     """Send an email.

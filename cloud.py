@@ -10,10 +10,10 @@ from utilities import dict_get
 class CloudFilesService():
 
     def __init__(self):
-        cf_user                 = dict_get(os.environ, 'ENEE_CLOUDFILES_USER')
-        cf_api_key              = dict_get(os.environ, 'ENEE_CLOUDFILES_API_KEY')
+        cf_user                 = dict_get(os.environ, 'CLOUDFILES_USER')
+        cf_api_key              = dict_get(os.environ, 'CLOUDFILES_API_KEY')
         self.conn               = cloudfiles.get_connection(username=cf_user, api_key=cf_api_key, timeout=15)
-        self._container         = self.conn.get_container(dict_get(os.environ, 'ENEE_CLOUDFILES_CONTAINER_NAME'))
+        self._container         = self.conn.get_container(dict_get(os.environ, 'CLOUDFILES_CONTAINER_NAME'))
         self._test_process_time = 0
 
     #####################################################################
