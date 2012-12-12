@@ -67,7 +67,7 @@ To install the application and its dependencies on a Mac (with brew):
 Environmental variables
 -----------------------
 
-The following environment variables will need to be set in order for the app to work. How you get them set is up to you (I wrote a simple Bash script).
+The following environment variables will need to be set in order for the app to work. How you get them set is up to you (I wrote a simple Bash script, run.sh).
 
 export DEBUG=<bool>
 export HOST=<string>
