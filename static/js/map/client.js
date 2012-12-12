@@ -1735,7 +1735,8 @@ var LandingPagePublicView = function(_container, _controller) {
     self.DEFAULT_LATLNG = new google.maps.LatLng(14.838664, -89.15529600000001);
     self.latLngs        = [];
     self.infowindow     = new google.maps.InfoWindow({
-        content: null
+        content: null,
+        maxWidth: (jQuery(window).width()*0.8)
     });
 
     self.resetMap = function() {
