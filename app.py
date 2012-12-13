@@ -12,6 +12,7 @@ import os
 import sys
 import json
 import logging
+import barrister
 
 app = Flask(__name__)
 app.secret_key = dict_get(os.environ, "FLASK_SECRET_KEY")
@@ -48,8 +49,25 @@ service = WebService()
 cloudFilesService = CloudFilesService()
 
 #################################################################
+# barrister #
+#############
+
+class SMS(object):
+
+    def get_projects(self):
+        return service.get_projects({ "user_id": dict_get(session, "user_id")})
+
+contract = barrister.contract_from_file("sms.json")
+server   = barrister.Server(contract)
+server.add_handler("SimpleMappingSystem", SMS())
+
+#################################################################
 # request handlers #
 ####################
+
+@app.route('/api-new', methods=['POST'])
+def sms():
+    return server.call_json(request.data)
 
 @app.route('/')
 def index():

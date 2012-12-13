@@ -192,7 +192,7 @@ class WebService():
         WHERE
             b.user_id = %s"""
         params = (req["user_id"])
-        return dict(projects=self.db.selectAll(sql, params))
+        return dict(projects=list(self.db.selectAll(sql, params)))
 
     def add_project(self, req):
         schema = {
