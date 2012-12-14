@@ -8,6 +8,26 @@ struct Project {
     access_type AccessType
 }
 
+struct User {
+    email                       string [optional]
+    name                        string
+    date_created                int
+    user_id                     string
+    default_language            Language [optional]
+    default_gps_format          GPSFormat [optional]
+    default_measurement_system  MeasurementSystem [optional]
+    default_google_map_type     GoogleMapType [optional]
+    needs_to_update_settings    bool [optional]
+}
+
+struct UserSettingsUpdate {
+    user_id                     string
+    default_language            Language
+    default_gps_format          GPSFormat
+    default_measurement_system  MeasurementSystem
+    default_google_map_type     GoogleMapType
+}
+
 enum AccessType {
     OWNER
 }
@@ -37,9 +57,9 @@ enum GoogleMapType {
 }
 
 interface SimpleMappingSystem {
-    get_projects() UserPortfolio
-//    get_user_settings()
-//    update_user_settings()
+    get_projects(userId string) UserPortfolio
+    get_user_settings(userId string) User
+    update_user_settings(update UserSettingsUpdate) bool
 //    add_project()
 //    search_positions()
 //    add_position()

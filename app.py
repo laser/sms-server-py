@@ -54,8 +54,18 @@ cloudFilesService = CloudFilesService()
 
 class SMS(object):
 
-    def get_projects(self):
-        return service.get_projects({ "user_id": dict_get(session, "user_id")})
+    def get_projects(self, user_id):
+        return service.get_projects({
+            "user_id": user_id
+        })
+
+    def get_user_settings(self, user_id):
+        return service.get_user_settings({
+            "user_id": user_id
+        })
+
+    def update_user_settings(self, o):
+        return service.update_user_settings(o)
 
 contract = barrister.contract_from_file("sms.json")
 server   = barrister.Server(contract)

@@ -177,8 +177,12 @@ class WebService():
             default_google_map_type = %s
         WHERE
             user_id = %s"""
+
         params = (req["default_language"], req["default_gps_format"], req["default_measurement_system"], req["default_google_map_type"], req["user_id"])
+
         self.db.execute(sql, params)
+
+        return True
     
     def get_projects(self, req):
         schema = {}
