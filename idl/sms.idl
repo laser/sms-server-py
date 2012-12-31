@@ -1,3 +1,8 @@
+struct PositionSearch {
+    project_id                  int
+    keyword                     string [optional]
+}
+
 struct UserPortfolio {
     projects                    []UserProject
 }
@@ -29,6 +34,31 @@ struct UserSettingsUpdate {
     default_gps_format          GPSFormat
     default_measurement_system  MeasurementSystem
     default_google_map_type     GoogleMapType
+}
+
+struct Position {
+    position_id                 int
+    position_properties         []PositionProperty
+}
+
+struct PositionProperty {
+    field_type                  FieldType
+    name                        string
+    value                       string
+    property_id                 int
+    visible                     YesNo
+}
+
+enum YesNo {
+    Y
+    N
+}
+
+enum FieldType {
+    NUMBER
+    STRING
+    IMAGE
+    IMAGE_LIST
 }
 
 enum AccessType {
@@ -64,7 +94,7 @@ interface SimpleMappingSystem {
     get_user_settings(userId string) User
     update_user_settings(update UserSettingsUpdate) bool
     add_project(projectName string, userId string) Project
-//    search_positions()
+    search_positions(search PositionSearch) []Position
 //    add_position()
 //    get_position_fields()
 //    add_position_field()

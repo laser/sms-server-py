@@ -73,6 +73,16 @@ class SMS(object):
             "user_id": user_id
         })['project']
 
+    def search_positions(self, o):
+        user_id = dict_get(session, 'user_id')
+
+        return service.search_positions({
+            "project_id": o['project_id'],
+            "keyword": o['keyword'],
+            "user_id": user_id
+
+        })['positions']
+
 contract = barrister.contract_from_file("sms.json")
 server   = barrister.Server(contract)
 server.add_handler("SimpleMappingSystem", SMS())
