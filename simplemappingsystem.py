@@ -96,7 +96,6 @@ class WebService():
                 position_field_id=new_id,
                 field_type=req["field_type"],
                 name=req["name"],
-                project_id=req["project_id"],
                 visible="Y"))
 
     def get_position_fields(self, req):
@@ -125,7 +124,7 @@ class WebService():
         else:
             temp_b = temp
 
-        if (req.has_key("suppress_field_types") and req["suppress_field_types"] == True):
+        if (req.has_key("suppress_field_types") and len(req["suppress_field_types"]) > 0):
             for position_field in temp_b:
                 if (not position_field["field_type"] in req["suppress_field_types"]):
                     position_fields.append(position_field)
@@ -362,6 +361,8 @@ class WebService():
         """
         params = (req["position_field_id"])
         self.db.execute(sql, params)
+
+        return True
 
     def delete_project_access(self, req):
         schema = {

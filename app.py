@@ -78,7 +78,6 @@ class SMS(object):
             "project_id": o['project_id'],
             "keyword": o['keyword'],
             "user_id": dict_get(session, 'user_id')
-
         })['positions']
 
     def add_position(self, project_id, properties, user_id):
@@ -95,6 +94,24 @@ class SMS(object):
             "suppress_field_types": o["suppress_field_types"],
             "user_id": dict_get(session, 'user_id')
         })["position_fields"])
+
+    def add_position_field(self, o):
+        return service.add_position_field({
+            "project_id": o["project_id"],
+            "field_type": o["field_type"],
+            "name": o["name"]
+        })["position_field"]
+
+    def delete_position_field(self, position_field_id):
+        return service.delete_position_field({
+            "position_field_id": position_field_id
+        })
+
+    def get_project_access(self, project_id):
+        return list(service.get_project_access({
+            "project_id": project_id,
+            "user_id": dict_get(session, 'user_id')
+        })["project_access"])
 
 contract = barrister.contract_from_file("sms.json")
 server   = barrister.Server(contract)

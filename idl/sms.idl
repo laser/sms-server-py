@@ -59,7 +59,13 @@ struct PositionProperty {
 struct GetPositionFieldsRequest {
     project_id                  int
     suppress_core_fields        bool [optional]
-    suppress_field_types        bool [optional]
+    suppress_field_types        []FieldType [optional]
+}
+
+struct CreatePositionField {
+    project_id                  int
+    field_type                  FieldType
+    name                        string
 }
 
 struct PositionField {
@@ -67,6 +73,14 @@ struct PositionField {
     field_type                  FieldType
     name                        string
     visible                     YesNo
+}
+
+struct ProjectAccess {
+    project_access_id           int
+    project_id                  int
+    user_id                     string [optional]
+    email                       string [optional]
+    access_type                 AccessType
 }
 
 enum YesNo {
@@ -83,6 +97,8 @@ enum FieldType {
 
 enum AccessType {
     OWNER
+    READONLY
+    PUBLIC
 }
 
 enum Language {
@@ -117,9 +133,9 @@ interface SimpleMappingSystem {
     search_positions(search PositionSearch) []Position
     add_position(projectId int, properties []CreatePositionProperty, userId string) Position
     get_position_fields(request GetPositionFieldsRequest) []PositionField
-//    add_position_field()
-//    delete_position_field()
-//    get_project_access()
+    add_position_field(field CreatePositionField) PositionField
+    delete_position_field(positionFieldId int) bool
+    get_project_access(projectId int) []ProjectAccess
 //    delete_project_access()
 //    add_project_access()
 //    update_position()
