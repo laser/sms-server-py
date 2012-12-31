@@ -56,6 +56,19 @@ struct PositionProperty {
     visible                     YesNo
 }
 
+struct GetPositionFieldsRequest {
+    project_id                  int
+    suppress_core_fields        bool [optional]
+    suppress_field_types        bool [optional]
+}
+
+struct PositionField {
+    position_field_id           int
+    field_type                  FieldType
+    name                        string
+    visible                     YesNo
+}
+
 enum YesNo {
     Y
     N
@@ -103,7 +116,7 @@ interface SimpleMappingSystem {
     add_project(projectName string, userId string) Project
     search_positions(search PositionSearch) []Position
     add_position(projectId int, properties []CreatePositionProperty, userId string) Position
-//    get_position_fields()
+    get_position_fields(request GetPositionFieldsRequest) []PositionField
 //    add_position_field()
 //    delete_position_field()
 //    get_project_access()

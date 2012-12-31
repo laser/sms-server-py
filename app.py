@@ -74,12 +74,10 @@ class SMS(object):
         })['project']
 
     def search_positions(self, o):
-        user_id = dict_get(session, 'user_id')
-
         return service.search_positions({
             "project_id": o['project_id'],
             "keyword": o['keyword'],
-            "user_id": user_id
+            "user_id": dict_get(session, 'user_id')
 
         })['positions']
 
@@ -89,6 +87,14 @@ class SMS(object):
             "position_properties": properties,
             "user_id": user_id
         })
+
+    def get_position_fields(self, o):
+        return list(service.get_position_fields({
+            "project_id": o["project_id"],
+            "suppress_core_fields": o["suppress_core_fields"],
+            "suppress_field_types": o["suppress_field_types"],
+            "user_id": dict_get(session, 'user_id')
+        })["position_fields"])
 
 contract = barrister.contract_from_file("sms.json")
 server   = barrister.Server(contract)

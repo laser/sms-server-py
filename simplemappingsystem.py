@@ -118,14 +118,14 @@ class WebService():
         temp_b = []
         position_fields = []
 
-        if (req.has_key("suppress_core_fields")):
+        if (req.has_key("suppress_core_fields") and req["suppress_core_fields"] == True):
             for position_field in temp:
                 if (not "core_" in position_field["name"]):
                     temp_b.append(position_field)
         else:
             temp_b = temp
 
-        if (req.has_key("suppress_field_types")):
+        if (req.has_key("suppress_field_types") and req["suppress_field_types"] == True):
             for position_field in temp_b:
                 if (not position_field["field_type"] in req["suppress_field_types"]):
                     position_fields.append(position_field)
