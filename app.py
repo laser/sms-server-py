@@ -67,6 +67,12 @@ class SMS(object):
     def update_user_settings(self, o):
         return service.update_user_settings(o)
 
+    def add_project(self, project_name, user_id):
+        return service.add_project({
+            "name": project_name,
+            "user_id": user_id
+        })['project']
+
 contract = barrister.contract_from_file("sms.json")
 server   = barrister.Server(contract)
 server.add_handler("SimpleMappingSystem", SMS())

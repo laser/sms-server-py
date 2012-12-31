@@ -1,11 +1,14 @@
 struct UserPortfolio {
-    projects []Project
+    projects                    []UserProject
 }
 
 struct Project {
-    project_id  int
-    name        string
-    access_type AccessType
+    project_id                  int
+    name                        string
+}
+
+struct UserProject extends Project {
+    access_type                 AccessType
 }
 
 struct User {
@@ -60,7 +63,7 @@ interface SimpleMappingSystem {
     get_projects(userId string) UserPortfolio
     get_user_settings(userId string) User
     update_user_settings(update UserSettingsUpdate) bool
-//    add_project()
+    add_project(projectName string, userId string) Project
 //    search_positions()
 //    add_position()
 //    get_position_fields()
