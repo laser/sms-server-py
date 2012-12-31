@@ -38,7 +38,14 @@ struct UserSettingsUpdate {
 
 struct Position {
     position_id                 int
+    project_id                  int
     position_properties         []PositionProperty
+}
+
+struct CreatePositionProperty {
+    field_type                  FieldType
+    name                        string
+    value                       string
 }
 
 struct PositionProperty {
@@ -95,7 +102,7 @@ interface SimpleMappingSystem {
     update_user_settings(update UserSettingsUpdate) bool
     add_project(projectName string, userId string) Project
     search_positions(search PositionSearch) []Position
-//    add_position()
+    add_position(projectId int, properties []CreatePositionProperty, userId string) Position
 //    get_position_fields()
 //    add_position_field()
 //    delete_position_field()

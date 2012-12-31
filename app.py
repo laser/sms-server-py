@@ -83,6 +83,13 @@ class SMS(object):
 
         })['positions']
 
+    def add_position(self, project_id, properties, user_id):
+        return service.add_position({
+            "project_id": project_id,
+            "position_properties": properties,
+            "user_id": user_id
+        })
+
 contract = barrister.contract_from_file("sms.json")
 server   = barrister.Server(contract)
 server.add_handler("SimpleMappingSystem", SMS())

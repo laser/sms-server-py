@@ -290,6 +290,7 @@ class WebService():
                 positions[row["position_id"]] = dict()
 
             positions[row["position_id"]]["position_id"] = row["position_id"]
+            positions[row["position_id"]]["project_id"] = row["project_id"]
 
             if not positions[row["position_id"]].has_key("position_properties"):
                 positions[row["position_id"]]["position_properties"] = list()
