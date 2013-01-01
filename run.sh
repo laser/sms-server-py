@@ -19,5 +19,9 @@ export GARMIN_KEY=somekey
 export FLASK_SECRET_KEY=somekey
 export OAUTH_CONSUMER_KEY=somedomain.com
 export OAUTH_CONSUMER_SECRET=somekey
+export SMTP_USER=fake@example.com
+export SMTP_PASSWORD=somepassword
+export SMTP_SERVER=someserver.com
+export SMTP_PORT=1234
 
 ../bin/python app.py
