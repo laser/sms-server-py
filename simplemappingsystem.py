@@ -379,6 +379,8 @@ class WebService():
         params = (req["project_access_id"])
         self.db.execute(sql, params)
 
+        return True
+
     def add_project_access(self, req):
         project_access = []
         user = self.__get_user(req["user_id"])
@@ -479,6 +481,8 @@ class WebService():
         params = (req["position_id"])
         self.db.execute(sql, params)
 
+        return True
+
     def update_position_fields(self, req):
         i = 0
         for position_field in req["position_fields"]:
@@ -494,6 +498,8 @@ class WebService():
             params = (position_field["visible"], i, position_field["position_field_id"])
             self.db.execute(sql, params)
             i = i + 1
+
+        return True
         
     #####################################################################
     # private #

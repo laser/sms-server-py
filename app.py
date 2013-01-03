@@ -64,54 +64,107 @@ class SMS(object):
             "user_id": user_id
         })
 
-    def update_user_settings(self, o):
-        return service.update_user_settings(o)
+    def update_user_settings(self, user_id, default_language, default_gps_format, default_measurement_system, default_google_map_type):
+        return service.update_user_settings({
+            "default_gps_format": default_gps_format,
+            "default_google_map_type": default_google_map_type,
+            "default_language": default_language,
+            "default_measurement_system": default_measurement_system,
+            "user_id": user_id,
+        })
 
-    def add_project(self, project_name, user_id):
+    def add_project(self, user_id, project_name):
         return service.add_project({
             "name": project_name,
             "user_id": user_id
-        })['project']
+        })["project"]
 
-    def search_positions(self, o):
+    def search_positions(self, user_id, project_id, keyword):
         return service.search_positions({
-            "project_id": o['project_id'],
-            "keyword": o['keyword'],
-            "user_id": dict_get(session, 'user_id')
-        })['positions']
+            "keyword": keyword,
+            "project_id": project_id,
+            "user_id": user_id
+        })["positions"]
 
-    def add_position(self, project_id, properties, user_id):
+    def add_position(self, user_id, project_id, properties):
         return service.add_position({
             "project_id": project_id,
             "position_properties": properties,
             "user_id": user_id
         })
 
-    def get_position_fields(self, o):
+    def get_position_fields(self, user_id, project_id, suppress_core_fields, suppress_field_types):
         return list(service.get_position_fields({
-            "project_id": o["project_id"],
-            "suppress_core_fields": o["suppress_core_fields"],
-            "suppress_field_types": o["suppress_field_types"],
-            "user_id": dict_get(session, 'user_id')
+            "project_id": project_id,
+            "suppress_core_fields": suppress_core_fields,
+            "suppress_field_types": suppress_field_types,
+            "user_id": user_id
         })["position_fields"])
 
-    def add_position_field(self, o):
+    def add_position_field(self, user_id, project_id, field_type, name):
         return service.add_position_field({
-            "project_id": o["project_id"],
-            "field_type": o["field_type"],
-            "name": o["name"]
+            "field_type": field_type,
+            "name": name,
+            "project_id": project_id,
+            "user_id": user_id
         })["position_field"]
 
-    def delete_position_field(self, position_field_id):
+    def delete_position_field(self, user_id, position_field_id):
         return service.delete_position_field({
-            "position_field_id": position_field_id
+            "position_field_id": position_field_id,
+            "user_id": user_id
         })
 
-    def get_project_access(self, project_id):
+    def get_project_access(self, user_id, project_id):
         return list(service.get_project_access({
             "project_id": project_id,
-            "user_id": dict_get(session, 'user_id')
+            "user_id": user_id
         })["project_access"])
+
+    def delete_project_access(self, user_id, project_access_id):
+        return service.delete_project_access({
+            "project_access_id": project_access_id,
+            "user_id": user_id
+        })
+    
+    def add_project_access(self, user_id, project_id, access_type, language, measurement_sys, gps_format, map_type, message, emails):
+        return service.add_project_access({
+            "access_type": access_type,
+            "default_google_map_type": map_type,
+            "default_gps_format": gps_format,
+            "default_language": language,
+            "default_measurement_system": measurement_sys,
+            "emails": emails,
+            "message": message,
+            "project_id": project_id,
+            "user_id": user_id
+        })
+
+    def delete_position(self, user_id, position_id):
+        return service.delete_position({
+            "position_id": position_id,
+            "user_id": user_id
+        })
+
+    def update_position_fields(self, user_id, position_fields):
+        return service.update_position_fields({
+            "position_fields": position_fields,
+            "user_id": user_id
+        })
+
+    def update_position(self, user_id, position_id, properties):
+        return service.update_position({
+            "position_id": position_id,
+            "position_properties": properties,
+            "user_id": user_id
+        })
+
+    def add_positions(self, user_id, project_id, positions):
+        return service.add_positions({
+            "positions": positions,
+            "project_id": project_id,
+            "user_id": user_id
+        })["positions"]
 
 contract = barrister.contract_from_file("sms.json")
 server   = barrister.Server(contract)

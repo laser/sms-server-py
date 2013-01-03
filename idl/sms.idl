@@ -1,8 +1,3 @@
-struct PositionSearch {
-    project_id                  int
-    keyword                     string [optional]
-}
-
 struct UserPortfolio {
     projects                    []UserProject
 }
@@ -28,44 +23,27 @@ struct User {
     needs_to_update_settings    bool [optional]
 }
 
-struct UserSettingsUpdate {
-    user_id                     string
-    default_language            Language
-    default_gps_format          GPSFormat
-    default_measurement_system  MeasurementSystem
-    default_google_map_type     GoogleMapType
-}
-
 struct Position {
     position_id                 int
     project_id                  int
     position_properties         []PositionProperty
 }
 
+struct CreatePosition {
+    position_properties         []CreatePositionProperty
+}
+
 struct CreatePositionProperty {
-    field_type                  FieldType
     name                        string
     value                       string
 }
 
 struct PositionProperty {
+    property_id                 int
     field_type                  FieldType
     name                        string
     value                       string
-    property_id                 int
     visible                     YesNo
-}
-
-struct GetPositionFieldsRequest {
-    project_id                  int
-    suppress_core_fields        bool [optional]
-    suppress_field_types        []FieldType [optional]
-}
-
-struct CreatePositionField {
-    project_id                  int
-    field_type                  FieldType
-    name                        string
 }
 
 struct PositionField {
@@ -78,9 +56,10 @@ struct PositionField {
 struct ProjectAccess {
     project_access_id           int
     project_id                  int
+    access_type                 AccessType
     user_id                     string [optional]
     email                       string [optional]
-    access_type                 AccessType
+    link                        string [optional]
 }
 
 enum YesNo {
@@ -126,20 +105,35 @@ enum GoogleMapType {
 }
 
 interface SimpleMappingSystem {
+    add_position(userId string, projectId int, properties []CreatePositionProperty) Position
+
+    add_position_field(userId string, projectId int, fieldType FieldType, name string) PositionField
+
+    add_positions(userId string, projectId int, positions []CreatePosition) []Position
+
+    add_project(userId string, projectName string) Project
+
+    add_project_access(userId string, projectId int, accessType AccessType, language Language, measurementSys MeasurementSystem, gpsFormat GPSFormat, mapType GoogleMapType, message string, emails []string) ProjectAccess
+
+    delete_position(userId string, positionId int) bool
+
+    delete_position_field(userId string, positionFieldId int) bool
+
+    delete_project_access(userId string, projectAccessId int) bool
+
+    get_position_fields(userId string, projectId int, suppressCoreFields bool, suppressFieldTypes []FieldType) []PositionField
+
+    get_project_access(userId string, projectId int) []ProjectAccess
+
     get_projects(userId string) UserPortfolio
+
     get_user_settings(userId string) User
-    update_user_settings(update UserSettingsUpdate) bool
-    add_project(projectName string, userId string) Project
-    search_positions(search PositionSearch) []Position
-    add_position(projectId int, properties []CreatePositionProperty, userId string) Position
-    get_position_fields(request GetPositionFieldsRequest) []PositionField
-    add_position_field(field CreatePositionField) PositionField
-    delete_position_field(positionFieldId int) bool
-    get_project_access(projectId int) []ProjectAccess
-//    delete_project_access()
-//    add_project_access()
-//    update_position()
-//    delete_position()
-//    update_position_fields()
-//    add_positions()
+
+    search_positions(userId string, projectId int, keyword string) []Position
+
+    update_position(userId string, positionId int, properties []CreatePositionProperty) Position
+
+    update_position_fields(userId string, fields []PositionField) bool
+
+    update_user_settings(userId string, defaultLanguage Language, defaultGpsFormat GPSFormat, defaultMeasurementSystem MeasurementSystem, defaultGoogleMapType GoogleMapType) bool
 }
