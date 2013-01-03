@@ -1,0 +1,1 @@
+INSERT into `users` (user_id, email, name, date_created, default_language, default_gps_format, default_measurement_system, default_google_map_type) values ("test-1234", "test@example.com", "Test User", 0, "EN_US", "UTMWGS84", "IMPERIAL", "HYBRID");
