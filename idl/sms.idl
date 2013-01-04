@@ -1,7 +1,3 @@
-struct UserPortfolio {
-    projects                    []UserProject
-}
-
 struct Project {
     project_id                  int
     name                        string
@@ -119,13 +115,15 @@ interface SimpleMappingSystem {
 
     delete_position_field(userId string, positionFieldId int) bool
 
+    delete_project(userId string, projectId int) bool
+
     delete_project_access(userId string, projectAccessId int) bool
 
     get_position_fields(userId string, projectId int, suppressCoreFields bool, suppressFieldTypes []FieldType) []PositionField
 
     get_project_access(userId string, projectId int) []ProjectAccess
 
-    get_projects(userId string) UserPortfolio
+    get_projects(userId string) []UserProject
 
     get_user_settings(userId string) User
 

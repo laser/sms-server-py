@@ -500,7 +500,42 @@ class WebService():
             i = i + 1
 
         return True
-        
+
+    def delete_project(self, o):
+        sql = """DELETE FROM project_access WHERE project_id = %s"""
+        params = o["project_id"]
+        self.db.execute(sql, params)
+
+        sql = """DELETE FROM position_fields WHERE project_id = %s"""
+        params = o["project_id"]
+        self.db.execute(sql, params)
+
+        sql = """
+        DELETE FROM
+            position_properties
+        WHERE
+            position_id IN (
+                SELECT
+                    position_id
+                FROM
+                    positions
+                WHERE
+                    positions.project_id = %s
+            )
+        """
+        params = o["project_id"]
+        self.db.execute(sql, params)
+
+        sql = """DELETE FROM positions WHERE project_id = %s"""
+        params = o["project_id"]
+        self.db.execute(sql, params)
+
+        sql = """DELETE FROM projects WHERE project_id = %s"""
+        params = o["project_id"]
+        self.db.execute(sql, params)
+
+        return True
+
     #####################################################################
     # private #
     ###########

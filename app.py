@@ -57,7 +57,7 @@ class SMS(object):
     def get_projects(self, user_id):
         return service.get_projects({
             "user_id": user_id
-        })
+        })["projects"]
 
     def get_user_settings(self, user_id):
         return service.get_user_settings({
@@ -165,6 +165,12 @@ class SMS(object):
             "project_id": project_id,
             "user_id": user_id
         })["positions"]
+
+    def delete_project(self, user_id, project_id):
+        return service.delete_project({
+            "project_id": project_id,
+            "user_id": user_id
+        })
 
 contract = barrister.contract_from_file("sms.json")
 server   = barrister.Server(contract)
