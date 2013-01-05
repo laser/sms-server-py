@@ -45,7 +45,6 @@ To install the application and its dependencies on a Mac (with brew):
     cd ~/dev/sms
     source bin/activate
     pip install -r simplemappingsystem.com/requirements.txt
-    deactivate
 
 7. configure mysql and create a database (I called mine "radstuff")
 
@@ -57,11 +56,35 @@ To install the application and its dependencies on a Mac (with brew):
     mysql --user=whatever --password radstuff < patch2.sql
     mysql --user=whatever --password radstuff < [...etc]
 
-9. to run the app (env variables must be set, somehow):
+9. set environment variables
+
+    export DEBUG=True
+    export HOST=127.0.0.1
+    export PORT=3002
+    export DB_USER=root
+    export DB_PASS=password
+    export DB_NAME=radstuff
+    export ENV_DOMAIN=somedomain.com
+    export GMAIL_USER=someaddress@gmail.com
+    export GMAIL_PWD=somepassword
+    export UPLOADS_DEFAULT_DEST=/var/www/somedomain.com/temp
+    export CLOUDFILES_USER=someuser
+    export CLOUDFILES_API_KEY=someapikey
+    export CLOUDFILES_CONTAINER_NAME=somedomain.com
+    export GARMIN_DOMAIN=http://somedomain.com/
+    export GARMIN_KEY=somekey
+    export FLASK_SECRET_KEY=somekey
+    export OAUTH_CONSUMER_KEY=somedomain.com
+    export OAUTH_CONSUMER_SECRET=somekey
+    export SMTP_USER=fake@example.com
+    export SMTP_PASSWORD=somepassword
+    export SMTP_SERVER=someserver.com
+    export SMTP_PORT=1234
+
+10. generate Barrister contract & docs
 
     cd ~/dev/sms
-    source bin/activate
-    bin/python simplemappingsystem.com/app.py
+    barrister -t "SimpleMappingSystem" -d sms.html -j sms.json idl/sms.idl
 
 
 Environmental variables
