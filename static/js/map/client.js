@@ -4743,3 +4743,42 @@ var Service = function(userId, proxy) {
 
     return self;
 };
+
+var App = function(cfg) {
+
+    this.start = function() {
+        Util.loadLanguageFile(function() {
+            var el,
+                controller,
+                service,
+                modal,
+                mask,
+                httpClient;
+
+            httpClient = Barrister.httpClient("/api-new");
+
+            httpClient.loadContract(function(err) {
+                var proxy;
+
+                if (err) {
+                    alert("Unable to load contract: " + err);
+                }
+                else {
+                    proxy = httpClient.proxy("SimpleMappingSystem");
+                    mask = new Mask(function() {
+                        modal = new Modal(function(modal) {
+                            el         = document.getElementById("page");
+                            service    = new Service(cfg.userId, proxy);
+                            controller = new LandingPageController(service, modal, el);
+
+                            service.garminDomain = cfg.garminDomain;
+                            service.garminKey = cfg.garminKey;
+                            controller.userId = cfg.userId;
+                            controller.start();
+                        }, null, null);
+                    });
+                }
+            });
+        }, cfg.defaultLanguage || jQuery.cookie("default_language"));
+    }
+};
