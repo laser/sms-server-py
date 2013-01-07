@@ -197,13 +197,6 @@ def index():
         passthrough["user"]['default_language'] = "EN_US"
     return render_template('index.html', passthrough = passthrough)
 
-@app.route('/garmin')
-def garmin():
-    passthrough = dict()
-    passthrough["site"] = dict(garmin_domain = garmin_domain, garmin_key = garmin_key)
-    passthrough["user"] = service.user_get({ 'user_id' : dict_get(session, 'user_id') })
-    return render_template('garmin.html', passthrough = passthrough)
-
 @app.route('/public/<default_language>/<default_gps_format>/<default_measurement_system>/<project_id>/', methods=['GET'])
 @app.route('/public/<default_language>/<default_gps_format>/<default_measurement_system>/<project_id>/<default_google_map_type>', methods=['GET'])
 def show_public_project(project_id, default_language, default_gps_format, default_measurement_system, default_google_map_type="SATELLITE"):
