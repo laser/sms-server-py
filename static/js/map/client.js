@@ -4301,8 +4301,8 @@ var LandingPageController = function(_service, _modal, _container) {
             self.view.render();
         }
         else {
-            _service.getProjects({}, function(o) {
-                self.view.projects = o.projects;
+            _service.getProjects({}, function(projects) {
+                self.view.projects = projects;
                 _service.userMustEnterSettings({}, function(o) {
                     self.userSettings      = o;
                     self.view.userSettings = o;
@@ -4477,7 +4477,7 @@ var LandingPageController = function(_service, _modal, _container) {
 //  Service  //
 ///////////////
 
-var Service = function() {
+var Service = function(userId, proxy) {
     var self;
 
     self = {};
@@ -4509,6 +4509,20 @@ var Service = function() {
             url: url
         });
     }
+
+    function dispenseHandler(success, failure) {
+        return function() {
+            var args = Array.prototype.slice.call(arguments),
+                err  = args[0];
+
+            if (err === null) {
+                success.apply(null, args.slice(1, args.length));
+            }
+            else {
+                failure.call(null, err);
+            }
+        }
+    };
 
     function ajaxPost(url, data, successCallback, failureCallback) {
         ajax("POST", url, data, successCallback, failureCallback);
@@ -4548,7 +4562,7 @@ var Service = function() {
     };
 
     self.updateUserSettings = function(data, s, f) {
-        ajaxPost("/api/update_user_settings", data, s, f);
+        proxy.update_user_settings(userId, data["default_language"], data["default_gps_format"], data["default_measurement_system"], data["default_google_map_type"], dispenseHandler(s, f));
     };
 
     self.addPosition = function(data, s, f) {
@@ -4556,7 +4570,7 @@ var Service = function() {
     };
 
     self.getProjects = function(data, s, f) {
-        ajaxPost("/api/get_projects", data, s, f);
+        proxy.get_projects(userId, dispenseHandler(s, f));
     };
 
     self.updatePositionFields = function(data, s, f) {

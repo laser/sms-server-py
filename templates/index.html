@@ -4,7 +4,8 @@
 <div id="temp"></div>
 <script type="text/javascript">
     jQuery(function() {
-        var default_language;
+        var default_language,
+            userId = {{ passthrough['user']['user_id']|tojson|safe }};
 
         default_language = jQuery.cookie("default_language") || {{ passthrough['user']['default_language']|tojson|safe }};
 
@@ -14,19 +15,32 @@
                 service,
                 modal,
                 mask,
-                default_language;
+                default_language,
+                httpClient;
 
-            mask = new Mask(function() {
-                modal = new Modal(function(modal) {
-                    el         = document.getElementById("page");
-                    service    = new Service();
-                    controller = new LandingPageController(service, modal, el);
+            httpClient = Barrister.httpClient("/api-new");
 
-                    service.garminDomain = "{{ passthrough['site']['garmin_domain']|safe }}";
-                    service.garminKey = {{ passthrough['site']['garmin_key']|tojson|safe }};
-                    controller.userId = {{ passthrough['user']['user_id']|tojson|safe }};
-                    controller.start();
-                }, null, null);
+            httpClient.loadContract(function(err) {
+                var proxy;
+
+                if (err) {
+                    alert("Unable to load contract: " + err);
+                }
+                else {
+                    proxy = httpClient.proxy("SimpleMappingSystem");
+                    mask = new Mask(function() {
+                        modal = new Modal(function(modal) {
+                            el         = document.getElementById("page");
+                            service    = new Service(userId, proxy);
+                            controller = new LandingPageController(service, modal, el);
+
+                            service.garminDomain = "{{ passthrough['site']['garmin_domain']|safe }}";
+                            service.garminKey = {{ passthrough['site']['garmin_key']|tojson|safe }};
+                            controller.userId = userId;
+                            controller.start();
+                        }, null, null);
+                    });
+                }
             });
         }, default_language);
     });
