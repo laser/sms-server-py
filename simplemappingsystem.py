@@ -455,7 +455,7 @@ class WebService():
 
         message = u"""%s:\n\r%s\n\r%s""" % (user["name"], req["message"], link)
         map_email.mail(to_email, [], emails_validated, "SimpleMappingSystem.com", message)
-        return dict(project_access=project_access)
+        return project_access
 
     def delete_position(self, req):
         schema = {

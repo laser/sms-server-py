@@ -5,7 +5,7 @@
 <script type="text/javascript">
     jQuery(function() {
 
-        var app = new App({
+        var app = new PrivateApp({
             "userId": {{ passthrough['user']['user_id']|tojson|safe }},
             "defaultLanguage": {{ passthrough['user']['default_language']|tojson|safe }},
             "garminDomain": "{{ passthrough['site']['garmin_domain']|safe }}",

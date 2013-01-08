@@ -109,7 +109,7 @@ interface SimpleMappingSystem {
 
     add_project(userId string, projectName string) Project
 
-    add_project_access(userId string, projectId int, accessType AccessType, language Language, measurementSys MeasurementSystem, gpsFormat GPSFormat, mapType GoogleMapType, message string, emails []string) ProjectAccess
+    add_project_access(userId string, projectId int, accessType AccessType, language Language, measurementSys MeasurementSystem, gpsFormat GPSFormat, mapType GoogleMapType, message string, emails []string) []ProjectAccess
 
     delete_position(userId string, positionId int) bool
 

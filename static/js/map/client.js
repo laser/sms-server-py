@@ -4239,7 +4239,7 @@ var AddUpdateProjectPermissionsController = function(_service, _modal) {
 
     self.addProjectAccess = function(userInput) {
         _service.addProjectAccess(userInput, function(o) {
-            self.projectAccess = jQuery.merge(self.projectAccess, o.project_access);
+            self.projectAccess = jQuery.merge(self.projectAccess, o);
             self.view.projectAccess = self.projectAccess;
             self.view.redrawPermissionsControl();
         },
@@ -4749,7 +4749,7 @@ var Service = function(userId, proxy) {
     return self;
 };
 
-var App = function(cfg) {
+var PrivateApp = function(cfg) {
 
     this.start = function() {
         Util.loadLanguageFile(function() {
@@ -4789,3 +4789,49 @@ var App = function(cfg) {
         }, cfg.defaultLanguage || jQuery.cookie("default_language"));
     }
 };
+
+var PublicApp = function(cfg) {
+
+    this.start = function() {
+        Util.loadLanguageFile(function() {
+            var el,
+                controller,
+                service,
+                modal,
+                mask,
+                httpClient;
+
+            httpClient = Barrister.httpClient("/api", {
+                "coerce": true
+            });
+
+            httpClient.loadContract(function(err) {
+                var proxy;
+
+                if (err) {
+                    alert("Unable to load contract: " + err);
+                }
+                else {
+                    proxy = httpClient.proxy("SimpleMappingSystem");
+
+                    mask = new Mask(function() {
+                        modal = new Modal(function(modal) {
+                            el         = document.getElementById("page");
+                            service    = new Service("", proxy);
+                            controller = new LandingPageBaseController(service, modal, el);
+
+                            controller.projectId = cfg.projectId;
+                            controller.userSettings = {
+                                default_language: cfg.defaultLanguage,
+                                default_gps_format: cfg.defaultGpsFormat,
+                                default_measurement_system: cfg.defaultMeasurementSystem,
+                                default_google_map_type: cfg.defaultGoogleMapType
+                            };
+                            controller.start();
+                        }, null, null);
+                    });
+                }
+            });
+        }, cfg.defaultLanguage);
+    };
+}
