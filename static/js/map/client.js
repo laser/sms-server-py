@@ -3960,7 +3960,7 @@ var ManagePositionFieldsModalController = function(_service, _modal) {
 
     self.addCustomPositionField = function(data) {
         function onSuccess(o) {
-            self.view.addRow(o.position_field);
+            self.view.addRow(o);
         }
 
         function onFailure(o) {
@@ -4276,7 +4276,7 @@ var LandingPageBaseController = function(_service, _modal, _container) {
             "keyword": searchKeyword || ""
         }, function(o) {
             self.view.resetMap();
-            self.view.drawPositions(o.positions);
+            self.view.drawPositions(o);
         }, function(o) {
             alert(JSON.stringify(o));
         });
@@ -4303,7 +4303,7 @@ var LandingPageController = function(_service, _modal, _container) {
         else {
             _service.getProjects({}, function(projects) {
                 self.view.projects = projects;
-                _service.userMustEnterSettings({}, function(o) {
+                _service.getUserSettings({}, function(o) {
                     self.userSettings      = o;
                     self.view.userSettings = o;
                     self.view.render();
@@ -4334,14 +4334,15 @@ var LandingPageController = function(_service, _modal, _container) {
 
         d = {
             "user_id": self.userId,
-            "project_id": self.projectId
+            "project_id": self.projectId,
+            "suppress_field_types": []
         };
 
         _service.getPositionFields(d, function(o) {
             var superEndWorkflow;
 
             mc                     = new ManagePositionFieldsModalController(_service, _modal);
-            mc.view.positionFields = o["position_fields"];
+            mc.view.positionFields = o;
             mc.projectId           = self.projectId;
             superEndWorkflow       = mc.endWorkflow;
             mc.endWorkflow         = function() {
@@ -4357,7 +4358,8 @@ var LandingPageController = function(_service, _modal, _container) {
 
         d = {
             "user_id": self.userId,
-            "project_id": self.projectId
+            "project_id": self.projectId,
+            "suppress_field_types": []
         };
 
         _service.getCustomPositionFields(d, function(o) {
@@ -4365,7 +4367,7 @@ var LandingPageController = function(_service, _modal, _container) {
             mc.projectId                = self.projectId;
             mc.userSettings             = self.userSettings;
             mc.position                 = position;
-            mc.customPositionFields = o["position_fields"];
+            mc.customPositionFields     = o;
             mc.startWorkflow();
             mc.onAddPositionSuccessCallback = function(position) {
                 self.view.drawSinglePosition(position, true);
@@ -4402,7 +4404,7 @@ var LandingPageController = function(_service, _modal, _container) {
         mc                          = new AddUpdateProjectPermissionsController(_service, _modal);
         mc.projectId                = self.projectId;
         _service.getProjectAccess({ project_id: self.projectId }, function(o) {
-            mc.projectAccess = o["project_access"];
+            mc.projectAccess = o;
             mc.startWorkflow();
         });
     };
@@ -4528,77 +4530,80 @@ var Service = function(userId, proxy) {
         ajax("POST", url, data, successCallback, failureCallback);
     }
 
-    self.getPositionFields = function(data, s, f) {
-        ajaxPost("/api/get_position_fields", data, s, f);
+    self.addPosition = function(data, s, f) {
+        proxy.add_position(userId, data["project_id"], data["position_properties"], dispenseHandler(s, f));
     };
 
-    self.getCustomPositionFields = function(data, s, f) {
-        data["suppress_core_fields"] = true;
-        ajaxPost("/api/get_position_fields", data, s, f);
+    self.addCustomPositionProperty = function(data, s, f) {
+        proxy.add_position_field(userId, data["project_id"], data["field_type"], data["name"], dispenseHandler(s, f));
     };
 
-    self.deletePosition = function(data, s, f) {
-        ajaxPost("/api/delete_position", data, s, f);
-    };
-
-    self.updatePosition = function(data, s, f) {
-        ajaxPost("/api/update_position", data, s, f);
-    };
-
-    self.searchPositions = function(data, s, f) {
-        ajaxPost("/api/search_positions", data, s, f);
+    self.addPositions = function(data, s, f) {
+        proxy.add_positions(userId, data["project_id"], data["positions"], dispenseHandler(s, f));
     };
 
     self.addProject = function(data, s, f) {
-        ajaxPost("/api/add_project", data, s, f);
+        proxy.add_project(userId, data["name"], dispenseHandler(s, f));
     };
 
-    self.userMustEnterSettings = function(data, s, f) {
-        ajaxPost("/api/get_user_settings", data, s, f);
+    self.addProjectAccess = function(data, s, f) {
+        proxy.add_project_access(userId, data["project_id"], data["access_type"], data["default_language"], data["default_measurement_system"], data["default_gps_format"], data["default_google_map_type"], data["message"], data["emails"], dispenseHandler(s, f));
     };
 
-    self.getUserSettings = function(data, s, f) {
-        ajaxPost("/api/get_user_settings", data, s, f);
+    self.deletePosition = function(data, s, f) {
+        proxy.delete_position(userId, data["position_id"], dispenseHandler(s, f));
     };
 
-    self.updateUserSettings = function(data, s, f) {
-        proxy.update_user_settings(userId, data["default_language"], data["default_gps_format"], data["default_measurement_system"], data["default_google_map_type"], dispenseHandler(s, f));
+    self.deleteCustomPositionField = function(data, s, f) {
+        proxy.delete_position_field(userId, data["position_field_id"], dispenseHandler(s, f));
     };
 
-    self.addPosition = function(data, s, f) {
-        ajaxPost("/api/add_position", data, s, f);
+    self.deleteProjectAccess = function(data, s, f) {
+        proxy.delete_project_access(userId, data["project_access_id"], dispenseHandler(s, f));
+    };
+
+    self.getCustomPositionFields = function(data, s, f) {
+        proxy.get_position_fields(userId, data["project_id"], true, data["suppress_field_types"], dispenseHandler(s, f));
+    };
+
+    self.getPositionFields = function(data, s, f) {
+        proxy.get_position_fields(userId, data["project_id"], false, data["suppress_field_types"], dispenseHandler(s, f));
+    };
+
+    self.getProjectAccess = function(data, s, f) {
+        proxy.get_project_access(userId, data["project_id"], dispenseHandler(s, f));
     };
 
     self.getProjects = function(data, s, f) {
         proxy.get_projects(userId, dispenseHandler(s, f));
     };
 
+    self.getUserSettings = function(data, s, f) {
+        proxy.get_user_settings(userId, dispenseHandler(s, f));
+    };
+
+    self.searchPositions = function(data, s, f) {
+        proxy.search_positions(userId, data["project_id"], data["keyword"], dispenseHandler(s, f));
+    };
+
+    self.updatePosition = function(data, s, f) {
+
+        jQuery.each(data["position_properties"], function(i, v) {
+            data["position_properties"][i] = {
+                "name": v["name"],
+                "value": v["value"]
+            }
+        });
+
+        proxy.update_position(userId, data["position_id"], data["position_properties"], dispenseHandler(s, f));
+    };
+
     self.updatePositionFields = function(data, s, f) {
-        ajaxPost("/api/update_position_fields", data, s, f);
+        proxy.update_position_fields(userId, data["position_fields"], dispenseHandler(s, f));
     };
 
-    self.addCustomPositionProperty = function(data, s, f) {
-        ajaxPost("/api/add_position_field", data, s, f);
-    };
-
-    self.deleteCustomPositionField = function(data, s, f) {
-        ajaxPost("/api/delete_position_field", data, s, f);
-    };
-
-    self.getProjectAccess = function(data, s, f) {
-        ajaxPost("/api/get_project_access", data, s, f);
-    };
-
-    self.deleteProjectAccess = function(data, s, f) {
-        ajaxPost("/api/delete_project_access", data, s, f);
-    };
-
-    self.addProjectAccess = function(data, s, f) {
-        ajaxPost("/api/add_project_access", data, s, f);
-    };
-
-    self.addPositions = function(data, s, f) {
-        ajaxPost("/api/add_positions", data, s, f);
+    self.updateUserSettings = function(data, s, f) {
+        proxy.update_user_settings(userId, data["default_language"], data["default_gps_format"], data["default_measurement_system"], data["default_google_map_type"], dispenseHandler(s, f));
     };
 
     self.getDefaultLanguages = function(data, s, f) {
@@ -4755,7 +4760,9 @@ var App = function(cfg) {
                 mask,
                 httpClient;
 
-            httpClient = Barrister.httpClient("/api-new");
+            httpClient = Barrister.httpClient("/api", {
+                "coerce": true
+            });
 
             httpClient.loadContract(function(err) {
                 var proxy;

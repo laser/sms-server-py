@@ -6,12 +6,8 @@ from oauthlib import OAuth
 from simplemappingsystem import WebService
 from cloud import CloudFilesService
 from utilities import dict_get
-from functools import wraps
 
 import os
-import sys
-import json
-import logging
 import barrister
 
 app = Flask(__name__)
@@ -180,7 +176,7 @@ server.add_handler("SimpleMappingSystem", SMS())
 # request handlers #
 ####################
 
-@app.route('/api-new', methods=['POST'])
+@app.route('/api', methods=['POST'])
 def sms():
     return server.call_json(request.data)
 
@@ -221,8 +217,8 @@ def login():
     provider = 'google'
     session.pop('user_id', None)
     session.pop('oauth_token', None)
-    p = oauth.remote_apps[provider]
-    return p.authorize(callback=url_for('login_authorized_'+provider))
+    p = oauth.remote_apps["google"]
+    return p.authorize(callback=url_for('login_authorized_google'))
 
 @app.route('/logout')
 def logout():
@@ -243,37 +239,6 @@ def login_authorized_google(resp):
         user_id = resp.data['id']
         name = resp.data['name']
         return __on_login('google', user_id, name, email)
-
-@app.route('/api/<operation>', methods=['POST'])
-def api(operation):
-    ok_fx = ['get_projects',
-             'get_user_settings',
-             'update_user_settings',
-             'add_project',
-             'search_positions',
-             'add_position',
-             'get_position_fields',
-             'add_position_field',
-             'delete_position_field',
-             'get_project_access',
-             'delete_project_access',
-             'add_project_access',
-             'update_position',
-             'delete_position',
-             'update_position_fields',
-             'add_positions']
-    json_data = request.json
-    json_data['user_id'] = dict_get(session, 'user_id')
-    if hasattr(service, operation) and operation in ok_fx:
-        fx = getattr(service, operation)
-        try:
-            data = __augment_with_status_property_if_needed(fx(json_data))
-        except Exception, e:
-            message = "Uncaught exception: %s" % e
-            data = dict(status="failure",message=message)
-        return jsonify(data)
-    else:
-        raise Exception('Unsupported operation: %s' % operation)
 
 @google.tokengetter
 def get_oauth_token_google():
@@ -301,15 +266,6 @@ def __load_user():
         resp = service.user_get({ 'user_id' : session['user_id'] })
         if resp.has_key('user_id'):
             request.user = resp
-
-def __augment_with_status_property_if_needed(data):
-    if data is None:
-        data = dict(status='success')
-    elif dict_get(data, 'errors') is None:
-        data['status'] = 'success'
-    elif dict_get(data, 'errors') is not None:
-        data['status'] = 'failure'
-    return data
 
 def __save_file_to_cloud(file):
     return cloudFilesService.save_file_to_rackspace(file)
