@@ -65,8 +65,6 @@ To install the application and its dependencies on a Mac (with brew):
     export DB_PASS=password
     export DB_NAME=radstuff
     export ENV_DOMAIN=somedomain.com
-    export GMAIL_USER=someaddress@gmail.com
-    export GMAIL_PWD=somepassword
     export UPLOADS_DEFAULT_DEST=/var/www/somedomain.com/temp
     export CLOUDFILES_USER=someuser
     export CLOUDFILES_API_KEY=someapikey

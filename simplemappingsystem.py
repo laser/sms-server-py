@@ -145,9 +145,8 @@ class WebService():
         FROM
             project_access a
         WHERE
-            a.project_id = %s
-            AND (a.user_id IS NULL OR a.user_id != %s)"""
-        params = (req["project_id"], req['user_id'])
+            a.project_id = %s"""
+        params = (req["project_id"])
         project_access = self.db.selectAll(sql, params)
         return dict(project_access=project_access)
     

@@ -17,7 +17,6 @@ class Db:
         self.use_unicode = use_unicode
         self.log = logging.getLogger()
         self._test_process_time = 0
-        print ("%s %s %s %s %s") % (self.host, self.port, self.user, self.password, self.dbname)
         self.connect()
 
     def close(self):

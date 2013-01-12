@@ -4404,7 +4404,13 @@ var LandingPageController = function(_service, _modal, _container) {
         mc                          = new AddUpdateProjectPermissionsController(_service, _modal);
         mc.projectId                = self.projectId;
         _service.getProjectAccess({ project_id: self.projectId }, function(o) {
-            mc.projectAccess = o;
+            var filtered = [];
+            for (var i = 0, len = o.length; i < len; i++) {
+                if (o[i].user_id !== self.userId) {
+                    filtered.push(o[i]);
+                }
+            }
+            mc.projectAccess = filtered;
             mc.startWorkflow();
         });
     };

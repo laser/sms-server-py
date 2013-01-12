@@ -38,7 +38,7 @@ def mail(to, cc, bcc, subject, text):
             break
 
     # Make sure email addresses do not contain non-ASCII characters
-    sender_addr = dict_get(os.environ, "GMAIL_USER").encode('ascii')
+    sender_addr = smtp_user.encode('ascii')
     toaddrs = [to] + cc + bcc
 
     # Create the message ('plain' stands for Content-Type: text/plain)
@@ -52,5 +52,5 @@ def mail(to, cc, bcc, subject, text):
     smtp.starttls()
     smtp.ehlo()
     smtp.login(smtp_user, smtp_password)
-    smtp.sendmail(dict_get(os.environ, "GMAIL_USER"), toaddrs, msg.as_string())
+    smtp.sendmail(smtp_user, toaddrs, msg.as_string())
     smtp.close()

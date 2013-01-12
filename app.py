@@ -261,7 +261,6 @@ def __on_login(provider, user_id, name, email):
 
 def __load_user():
     request.user = None
-    print dict_get(session, "user_id")
     if session.has_key('user_id'):
         resp = service.user_get({ 'user_id' : session['user_id'] })
         if resp.has_key('user_id'):
