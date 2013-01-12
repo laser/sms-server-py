@@ -293,4 +293,5 @@ if __name__ == '__main__':
     debug = bool(dict_get(os.environ, "DEBUG"))
     host  = dict_get(os.environ, "HOST")
     port  = int(dict_get(os.environ, "PORT"))
+    print "Running Flask server [%s, %s, %s]" % (debug, host, port)
     app.run(debug=debug, host=host, port=port)
