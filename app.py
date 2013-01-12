@@ -83,11 +83,17 @@ class SMS(object):
         })["positions"]
 
     def add_position(self, user_id, project_id, properties):
-        return service.add_position({
-            "project_id": project_id,
-            "position_properties": properties,
-            "user_id": user_id
-        })
+        required_names = ["core_icon", "core_latitude", "core_longitude"]
+
+        if (len(set([p["name"] for p in properties]).intersection(required_names)) < 3):
+            raise barrister.RpcException(1002, "Must include core fields: %s, %s, %s" % (required_names[0], required_names[1], required_names[2]))
+        else:
+            return service.add_position({
+                "project_id": project_id,
+                "position_properties": properties,
+                "user_id": user_id
+            })
+
 
     def get_position_fields(self, user_id, project_id, suppress_core_fields, suppress_field_types):
         return list(service.get_position_fields({
@@ -118,23 +124,33 @@ class SMS(object):
         })["project_access"])
 
     def delete_project_access(self, user_id, project_access_id):
-        return service.delete_project_access({
-            "project_access_id": project_access_id,
-            "user_id": user_id
-        })
+        existing = service.get_project_access_by_id(project_access_id)
+
+        if (len(existing) > 0 and existing[0]["access_type"] == "OWNER"):
+            raise barrister.RpcException(1004, "Can't revoke OWNER ProjectAccess with id: %s" % user_id)
+        else:
+            return service.delete_project_access({
+                "project_access_id": project_access_id,
+                "user_id": user_id
+            })
     
     def add_project_access(self, user_id, project_id, access_type, language, measurement_sys, gps_format, map_type, message, emails):
-        return service.add_project_access({
-            "access_type": access_type,
-            "default_google_map_type": map_type,
-            "default_gps_format": gps_format,
-            "default_language": language,
-            "default_measurement_system": measurement_sys,
-            "emails": emails,
-            "message": message,
-            "project_id": project_id,
-            "user_id": user_id
-        })
+        if (len(emails) == 0 and access_type != "PUBLIC"):
+            raise barrister.RpcException(1002, "TRANSLATE: Must specify at least one email address if access_type is not PUBLIC")
+        elif (access_type == "OWNER"):
+            raise barrister.RpcException(1004, "Can't add OWNER ProjectAccess")
+        else:
+            return service.add_project_access({
+                "access_type": access_type,
+                "default_google_map_type": map_type,
+                "default_gps_format": gps_format,
+                "default_language": language,
+                "default_measurement_system": measurement_sys,
+                "emails": emails,
+                "message": message,
+                "project_id": project_id,
+                "user_id": user_id
+            })
 
     def delete_position(self, user_id, position_id):
         return service.delete_position({

@@ -1,3 +1,16 @@
+/*
+
+ERROR CODES
+
+Code    Description
+1000    Login Required (User is not logged in, but function requires a logged in user)
+1001    Permission Denied (User is logged in, but lacks permission to perform op. Usually b/c they don't own the entity being loaded/modified)
+1002    Invalid Params (General input validation errors, like string can't be blank, email not valid, etc)
+1003    Not Found (Semantic way to express that we couldn't find the data requested)
+1004    Illegal Operation (UI should not have called this function with the given params)
+
+*/
+
 struct Project {
     project_id                  int
     name                        string
@@ -102,6 +115,13 @@ enum GoogleMapType {
 }
 
 interface SimpleMappingSystem {
+    // add_position adds a position and its properties to a project.
+    // CreatePositionProperty names must correspond to PositionField already
+    // existing for this project
+    // 
+    // * 1004 - name specified in CreatePositionProperty does not correspond
+    //          to the name of a PositionField in this Project
+    // 
     add_position(userId string, projectId int, properties []CreatePositionProperty) Position
 
     add_position_field(userId string, projectId int, fieldType FieldType, name string) PositionField
@@ -110,6 +130,16 @@ interface SimpleMappingSystem {
 
     add_project(userId string, projectName string) Project
 
+    // add_project_access gives a user (by email) access to a project or can
+    // be used to grant PUBLIC access. Accepts an array of emails, which can
+    // be blank if PUBLIC access is being granted. Always returns true.
+    //
+    // Error Codes:
+    //
+    // * 1002 - Must specify at least one email address if accessType is not
+    //          PUBLIC
+    // * 1004 - Cannot add OWNER access for project
+    //
     add_project_access(userId string, projectId int, accessType AccessType, language Language, measurementSys MeasurementSystem, gpsFormat GPSFormat, mapType GoogleMapType, message string, emails []string) []ProjectAccess
 
     delete_position(userId string, positionId int) bool
@@ -118,6 +148,15 @@ interface SimpleMappingSystem {
 
     delete_project(userId string, projectId int) bool
 
+    // delete_project_access removes a project_access row from the system. This
+    // If could be tied to a user, an email, or could be a PUBLIC access. If no
+    // exists no entry exists for given id, the function no-ops. Always returns
+    // Always returns true.
+    //
+    // Error Codes:
+    //
+    // * 1004 - Cannot revoke OWNER access from project
+    //
     delete_project_access(userId string, projectAccessId int) bool
 
     get_position_fields(userId string, projectId int, suppressCoreFields bool, suppressFieldTypes []FieldType) []PositionField

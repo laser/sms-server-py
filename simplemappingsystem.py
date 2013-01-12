@@ -59,6 +59,16 @@ class WebService():
     # message handlers #
     #####********#######
 
+    def get_project_access_by_id(self, project_access_id):
+        sql = """
+        SELECT
+            a.project_access_id, a.project_id, a.user_id, a.email, a.access_type
+        FROM
+            project_access a
+        WHERE
+            a.project_access_id = %s"""
+        return list(self.db.selectAll(sql, project_access_id))
+
     def update_position(self, req):
         sql = """
         DELETE FROM
