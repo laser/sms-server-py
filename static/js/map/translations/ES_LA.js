@@ -89,6 +89,7 @@ var sMap = {
     access_OWNER: "Propietario",
     access_READONLY: "Solo leer",
     access_PUBLIC: "Publico en la Red",
+    access_COLLABORATOR: "Colaborador",
     existing_collaborators: "Colaboradores actuales (hacer click para removerlos)",
     button_send_invite: "Mandar Invitación",
     lightBox_image: "Imagen",

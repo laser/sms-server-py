@@ -1,0 +1,1 @@
+ALTER TABLE `project_access` CHANGE access_type access_type ENUM('OWNER', 'READONLY', 'PUBLIC', 'COLLABORATOR');

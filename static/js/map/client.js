@@ -3301,7 +3301,7 @@ var AddUpdateProjectPermissionsModalView = function(_modal, _controller) {
         sb_defaultGpsFormats         = new SelectBuilder("default_gps_format", false);
         sb_defaultGoogleMapTypes     = new SelectBuilder("default_google_map_type", false);
         sb_accessType                = new SelectBuilder("access_type", false)
-            .addOption("OWNER", sMap.get("access_OWNER"), true)
+            .addOption("COLLABORATOR", sMap.get("access_COLLABORATOR"), true)
             .addOption("READONLY", sMap.get("access_READONLY"), false)
             .addOption("PUBLIC", sMap.get("access_PUBLIC"), false)
             .setPostSyncCallback(showAppropriateFieldsForAccessType);
@@ -4406,7 +4406,7 @@ var LandingPageController = function(_service, _modal, _container) {
         _service.getProjectAccess({ project_id: self.projectId }, function(o) {
             var filtered = [];
             for (var i = 0, len = o.length; i < len; i++) {
-                if (o[i].user_id !== self.userId) {
+                if (o[i].access_type !== "OWNER") {
                     filtered.push(o[i]);
                 }
             }
@@ -4435,7 +4435,7 @@ var LandingPageController = function(_service, _modal, _container) {
     self.selectProject = function(projectId, access_type) {
         var fullControl;
 
-        fullControl    = access_type === "OWNER";
+        fullControl    = (access_type === "OWNER") || (access_type === "COLLABORATOR");
         self.projectId = projectId;
 
         self.setSearchKeyword(null);

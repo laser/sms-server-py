@@ -72,6 +72,7 @@ enum FieldType {
 
 enum AccessType {
     OWNER
+    COLLABORATOR
     READONLY
     PUBLIC
 }
