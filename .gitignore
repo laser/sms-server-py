@@ -1,0 +1,8 @@
+run.sh
+*.swp
+*.pyc
+*.iml
+.idea
+
+sms.html
+sms.json
