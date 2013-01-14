@@ -9,6 +9,7 @@ from utilities import dict_get
 
 import os
 import barrister
+import pdb
 
 app = Flask(__name__)
 app.secret_key = dict_get(os.environ, "FLASK_SECRET_KEY")
@@ -50,6 +51,9 @@ cloudFilesService = CloudFilesService()
 
 class SMS(object):
 
+    def __init__(self):
+        self.required_position_field_names = {"core_icon", "core_latitude", "core_longitude"}
+
     def get_projects(self, user_id):
         return service.get_projects({
             "user_id": user_id
@@ -83,25 +87,28 @@ class SMS(object):
         })["positions"]
 
     def add_position(self, user_id, project_id, properties):
-        required_names = ["core_icon", "core_latitude", "core_longitude"]
-
-        if (len(set([p["name"] for p in properties]).intersection(required_names)) < 3):
-            raise barrister.RpcException(1002, "Must include core fields: %s, %s, %s" % (required_names[0], required_names[1], required_names[2]))
+        if (not self.__has_required_fields(properties)):
+            raise barrister.RpcException(1004, "Must include core fields")
         else:
-            return service.add_position({
-                "project_id": project_id,
-                "position_properties": properties,
-                "user_id": user_id
-            })
-
+            if (not self.__has_valid_field_names(user_id, project_id, properties)):
+                raise barrister.RpcException(1004, "Can not include properties with names that don't correspond to fields for this project")
+            else:
+                if (not self.__has_core_field_values(properties)):
+                    raise barrister.RpcException(1002, "Must include values for core fields")
+                else:
+                    return service.add_position({
+                        "project_id": project_id,
+                        "position_properties": properties,
+                        "user_id": user_id
+                    })
 
     def get_position_fields(self, user_id, project_id, suppress_core_fields, suppress_field_types):
-        return list(service.get_position_fields({
+        return service.get_position_fields({
             "project_id": project_id,
             "suppress_core_fields": suppress_core_fields,
             "suppress_field_types": suppress_field_types,
             "user_id": user_id
-        })["position_fields"])
+        })
 
     def add_position_field(self, user_id, project_id, field_type, name):
         return service.add_position_field({
@@ -183,6 +190,27 @@ class SMS(object):
             "project_id": project_id,
             "user_id": user_id
         })
+    
+    def __has_core_field_values(self, properties):
+        core_properties = filter(lambda p: p["name"] in self.required_position_field_names, properties)
+        
+        return len(filter(lambda cp: len(cp["value"]) > 0, core_properties)) >= 3
+    
+    def __has_valid_field_names(self, user_id, project_id, properties):
+        provided_names  = set(p["name"] for p in properties) 
+        available_names = set(f["name"] for f in service.get_position_fields({
+            "project_id": project_id,
+            "suppress_core_fields": False,
+            "suppress_field_types": [],
+            "user_id": user_id
+        }))
+
+        return len(provided_names.intersection(available_names)) >= len(provided_names)
+        
+    def __has_required_fields(self, properties):
+        provided_names  = set(p["name"] for p in properties)
+        
+        return len(provided_names.intersection(self.required_position_field_names)) >= 3
 
 contract = barrister.contract_from_file("sms.json")
 server   = barrister.Server(contract)

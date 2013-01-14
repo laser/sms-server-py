@@ -141,7 +141,7 @@ class WebService():
         else:
             position_fields = temp_b
 
-        return dict(position_fields=position_fields)
+        return list(position_fields)
 
     def get_project_access(self, req):
         schema = {

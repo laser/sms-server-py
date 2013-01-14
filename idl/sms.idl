@@ -122,6 +122,11 @@ interface SimpleMappingSystem {
     // * 1004 - name specified in CreatePositionProperty does not correspond
     //          to the name of a PositionField in this Project
     // 
+    // * 1004 - missing one or more core fields from CreatePositionProperty
+    //          array
+    // 
+    // * 1002 - missing values for one or more core fields 
+    // 
     add_position(userId string, projectId int, properties []CreatePositionProperty) Position
 
     add_position_field(userId string, projectId int, fieldType FieldType, name string) PositionField
