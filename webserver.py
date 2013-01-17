@@ -42,179 +42,16 @@ google = oauth.remote_app(
 # service #
 #########
 
-service = WebService()
 cloudFilesService = CloudFilesService()
+service  = WebService()
 
 #################################################################
 # barrister #
 #############
 
-class SMS(object):
-
-    def __init__(self):
-        self.required_position_field_names = {"core_icon", "core_latitude", "core_longitude"}
-
-    def get_projects(self, user_id):
-        return service.get_projects({
-            "user_id": user_id
-        })["projects"]
-
-    def get_user_settings(self, user_id):
-        return service.get_user_settings({
-            "user_id": user_id
-        })
-
-    def update_user_settings(self, user_id, default_language, default_gps_format, default_measurement_system, default_google_map_type):
-        return service.update_user_settings({
-            "default_gps_format": default_gps_format,
-            "default_google_map_type": default_google_map_type,
-            "default_language": default_language,
-            "default_measurement_system": default_measurement_system,
-            "user_id": user_id,
-        })
-
-    def add_project(self, user_id, project_name):
-        return service.add_project({
-            "name": project_name,
-            "user_id": user_id
-        })["project"]
-
-    def search_positions(self, user_id, project_id, keyword):
-        return service.search_positions({
-            "keyword": keyword,
-            "project_id": project_id,
-            "user_id": user_id
-        })["positions"]
-
-    def add_position(self, user_id, project_id, properties):
-        if (not self.__has_required_fields(properties)):
-            raise barrister.RpcException(1004, "Must include core fields")
-        else:
-            if (not self.__has_valid_field_names(user_id, project_id, properties)):
-                raise barrister.RpcException(1004, "Can not include properties with names that don't correspond to fields for this project")
-            else:
-                if (not self.__has_core_field_values(properties)):
-                    raise barrister.RpcException(1002, "Must include values for core fields")
-                else:
-                    return service.add_position({
-                        "project_id": project_id,
-                        "position_properties": properties,
-                        "user_id": user_id
-                    })
-
-    def get_position_fields(self, user_id, project_id, suppress_core_fields, suppress_field_types):
-        return service.get_position_fields({
-            "project_id": project_id,
-            "suppress_core_fields": suppress_core_fields,
-            "suppress_field_types": suppress_field_types,
-            "user_id": user_id
-        })
-
-    def add_position_field(self, user_id, project_id, field_type, name):
-        return service.add_position_field({
-            "field_type": field_type,
-            "name": name,
-            "project_id": project_id,
-            "user_id": user_id
-        })["position_field"]
-
-    def delete_position_field(self, user_id, position_field_id):
-        return service.delete_position_field({
-            "position_field_id": position_field_id,
-            "user_id": user_id
-        })
-
-    def get_project_access(self, user_id, project_id):
-        return list(service.get_project_access({
-            "project_id": project_id,
-            "user_id": user_id
-        })["project_access"])
-
-    def delete_project_access(self, user_id, project_access_id):
-        existing = service.get_project_access_by_id(project_access_id)
-
-        if (len(existing) > 0 and existing[0]["access_type"] == "OWNER"):
-            raise barrister.RpcException(1004, "Can't revoke OWNER ProjectAccess with id: %s" % user_id)
-        else:
-            return service.delete_project_access({
-                "project_access_id": project_access_id,
-                "user_id": user_id
-            })
-    
-    def add_project_access(self, user_id, project_id, access_type, language, measurement_sys, gps_format, map_type, message, emails):
-        if (len(emails) == 0 and access_type != "PUBLIC"):
-            raise barrister.RpcException(1002, "TRANSLATE: Must specify at least one email address if access_type is not PUBLIC")
-        elif (access_type == "OWNER"):
-            raise barrister.RpcException(1004, "Can't add OWNER ProjectAccess")
-        else:
-            return service.add_project_access({
-                "access_type": access_type,
-                "default_google_map_type": map_type,
-                "default_gps_format": gps_format,
-                "default_language": language,
-                "default_measurement_system": measurement_sys,
-                "emails": emails,
-                "message": message,
-                "project_id": project_id,
-                "user_id": user_id
-            })
-
-    def delete_position(self, user_id, position_id):
-        return service.delete_position({
-            "position_id": position_id,
-            "user_id": user_id
-        })
-
-    def update_position_fields(self, user_id, position_fields):
-        return service.update_position_fields({
-            "position_fields": position_fields,
-            "user_id": user_id
-        })
-
-    def update_position(self, user_id, position_id, properties):
-        return service.update_position({
-            "position_id": position_id,
-            "position_properties": properties,
-            "user_id": user_id
-        })
-
-    def add_positions(self, user_id, project_id, positions):
-        return service.add_positions({
-            "positions": positions,
-            "project_id": project_id,
-            "user_id": user_id
-        })["positions"]
-
-    def delete_project(self, user_id, project_id):
-        return service.delete_project({
-            "project_id": project_id,
-            "user_id": user_id
-        })
-    
-    def __has_core_field_values(self, properties):
-        core_properties = filter(lambda p: p["name"] in self.required_position_field_names, properties)
-        
-        return len(filter(lambda cp: len(cp["value"]) > 0, core_properties)) >= 3
-    
-    def __has_valid_field_names(self, user_id, project_id, properties):
-        provided_names  = set(p["name"] for p in properties) 
-        available_names = set(f["name"] for f in service.get_position_fields({
-            "project_id": project_id,
-            "suppress_core_fields": False,
-            "suppress_field_types": [],
-            "user_id": user_id
-        }))
-
-        return len(provided_names.intersection(available_names)) >= len(provided_names)
-        
-    def __has_required_fields(self, properties):
-        provided_names  = set(p["name"] for p in properties)
-        
-        return len(provided_names.intersection(self.required_position_field_names)) >= 3
-
 contract = barrister.contract_from_file("sms.json")
 server   = barrister.Server(contract)
-server.add_handler("SimpleMappingSystem", SMS())
+server.add_handler("SimpleMappingSystem", service)
 
 #################################################################
 # request handlers #
@@ -291,10 +128,6 @@ def get_oauth_token_google():
 #################################################################
 # misc private #
 ################
-
-def __get_user_default_language(user_id):
-    resp = service.user_get({ 'user_id' : user_id })
-    return resp['default_language']
 
 def __on_login(provider, user_id, name, email):
     user_id = '%s-%s' % (provider, user_id)
