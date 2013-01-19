@@ -1,15 +1,11 @@
-/*
-
-ERROR CODES
-
-Code    Description
-1000    Login Required (User is not logged in, but function requires a logged in user)
-1001    Permission Denied (User is logged in, but lacks permission to perform op. Usually b/c they don't own the entity being loaded/modified)
-1002    Invalid Params (General input validation errors, like string can't be blank, email not valid, etc)
-1003    Not Found (Semantic way to express that we couldn't find the data requested)
-1004    Illegal Operation (UI should not have called this function with the given params)
-
-*/
+// ERROR CODES
+// 
+// Code    Description
+// 1000    Login Required (User is not logged in, but function requires a logged in user)
+// 1001    Permission Denied (User is logged in, but lacks permission to perform op. Usually b/c they don't own the entity being loaded/modified)
+// 1002    Invalid Params (General input validation errors, like string can't be blank, email not valid, etc)
+// 1003    Not Found (Semantic way to express that we couldn't find the data requested)
+// 1004    Illegal Operation (UI should not have called this function with the given params)
 
 struct Project {
     project_id                  int
