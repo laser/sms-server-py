@@ -1,0 +1,3 @@
+[submodule "static/client"]
+	path = static/client
+	url = https://github.com/hippipp/sms-client-legacy.git
