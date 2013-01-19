@@ -1,18 +1,10 @@
 SimpleMappingSystem
 ===================
 
-
 About
 -----
 
-Web-based (the Cloud!) mapping system written to support field engineers while serving in the Peace Corps in Honduras. Supports localization (English, Spanish, French currently translated; easy to add more), Garmin GPS device integration, multiple geocordinate systems (UTM, DMS, Degree-Decimal), image galleries, custom metadata, and permissioning. OAuth for login, CloudFiles for asset storage.
-
-
-Releases
---------
-
-I'm continuously deploying, or whatever.
-
+Python implementation of mapping system build while in the Peace Corps in Honduras. Supports i18n, Garmin GPS integration. Uses Google (OAuth2) for authentication, RackSpace CloudFiles for asset storage. 
 
 Installation
 ------------
@@ -69,8 +61,6 @@ To install the application and its dependencies on a Mac (with brew):
     export CLOUDFILES_USER=someuser
     export CLOUDFILES_API_KEY=someapikey
     export CLOUDFILES_CONTAINER_NAME=somedomain.com
-    export GARMIN_DOMAIN=http://somedomain.com/
-    export GARMIN_KEY=somekey
     export FLASK_SECRET_KEY=somekey
     export OAUTH_CONSUMER_KEY=somedomain.com
     export OAUTH_CONSUMER_SECRET=somekey
@@ -84,33 +74,4 @@ To install the application and its dependencies on a Mac (with brew):
     cd ~/dev/sms
     barrister -t "SimpleMappingSystem" -d sms.html -j sms.json idl/sms.idl
 
-
-Environmental variables
------------------------
-
-The following environment variables will need to be set in order for the app to work. How you get them set is up to you (I wrote a simple Bash script, run.sh).
-
-export DEBUG=<bool>
-export HOST=<string>
-export PORT=<number>
-export DB_USER=<string>
-export DB_PASS=<string>
-export DB_NAME=<string>
-export ENV_DOMAIN=<string>
-export GMAIL_USER=<string>
-export GMAIL_PWD=<string>
-export UPLOADS_DEFAULT_DEST=<string>
-export CLOUDFILES_USER=<string>
-export CLOUDFILES_API_KEY=<string>
-export CLOUDFILES_CONTAINER_NAME=<string>
-export GARMIN_DOMAIN=<string>
-export GARMIN_KEY=<string>
-export FLASK_SECRET_KEY=<string>
-export OAUTH_CONSUMER_KEY=<string>
-export OAUTH_CONSUMER_SECRET=<string>
-
-
-Copyright
----------
-
-Copyright (c) 2011-2013 Erin Swenson-Healey
+11. clone an sms client (view my other repos) into static/client and you're good to go
