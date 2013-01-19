@@ -416,7 +416,7 @@ class WebService():
                             access_type=access_type
                         ))
             else:
-                link = "http://%s/public/%s/%s/%s/%s/%s" % (self.env_domain, language, gps_format, measurement_sys, project_id, map_type)
+                link = "http://%s/#/public/%s/%s/%s/%s/%s" % (self.env_domain, language, gps_format, measurement_sys, project_id, map_type)
                 to_email = user["email"]
                 
                 # wipe previous public-access entry, if exists

@@ -4417,6 +4417,7 @@ var LandingPageController = function(_service, _modal, _container) {
 
     self.logOut = function() {
         window.location.href = "/logout";
+        return false;
     };
 
     self.addProject = function(projectName) {
@@ -4471,7 +4472,8 @@ var LandingPageController = function(_service, _modal, _container) {
             _service.updateUserSettings(o, function() {
                 controller.endWorkflow();
                 jQuery.cookie("default_language", o.default_language);
-                window.location.reload(true);
+                
+                window.location.href = "http://" + window.location.host + "/?" + Math.round(Math.random() * 100000).toString() + "#/private/" + self.userId + "/" + o.default_language;
             }, function() {
                 throw(o);
             });
