@@ -68,7 +68,7 @@ def sms():
 
 @app.route('/')
 def index():
-    return app.send_static_file("index.html")
+    return app.send_static_file("client/index.html")
 
 @app.route('/upload', methods=['POST', 'GET'])
 def upload():
