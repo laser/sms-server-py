@@ -3,7 +3,7 @@
 from flask import Flask, session, redirect, render_template, url_for
 from flask import request, flash, jsonify
 from oauthlib import OAuth
-from service import WebService
+from webservice import WebService
 from cloud import CloudFilesService
 from utilities import dict_get
 
