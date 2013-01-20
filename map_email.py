@@ -12,6 +12,18 @@ smtp_password = dict_get(os.environ, 'SMTP_PASSWORD')
 smtp_server = dict_get(os.environ, 'SMTP_SERVER')
 smtp_port = dict_get(os.environ, 'SMTP_PORT')
 
+if (smtp_user == None):
+    raise Exception("Missing SMTP_USER")
+
+if (smtp_password == None):
+    raise Exception("Missing SMTP_PASSWORD")
+
+if (smtp_server == None):
+    raise Exception("Missing SMTP_SERVER")
+
+if (smtp_port == None):
+    raise Exception("Missing SMTP_PORT")
+
 def mail(to, cc, bcc, subject, text):
     """Send an email.
 
