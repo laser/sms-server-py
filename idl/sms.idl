@@ -7,6 +7,11 @@
 // 1003    Not Found (Semantic way to express that we couldn't find the data requested)
 // 1004    Illegal Operation (UI should not have called this function with the given params)
 
+struct AccessToken {
+    access_token_id                    string
+    expiry_time                 int 
+}
+
 struct Project {
     project_id                  int
     name                        string
@@ -110,7 +115,11 @@ enum GoogleMapType {
     TERRAIN
 }
 
-interface SimpleMappingSystem {
+interface AuthService {
+    login(userId string, email string, name string) AccessToken
+}
+
+interface ProjectService { 
     // add_position adds a position and its properties to a project.
     // CreatePositionProperty names must correspond to PositionField already
     // existing for this project
@@ -123,13 +132,13 @@ interface SimpleMappingSystem {
     // 
     // * 1002 - missing values for one or more core fields 
     // 
-    add_position(userId string, projectId int, properties []CreatePositionProperty) Position
+    add_position(accessTokenId string, projectId int, properties []CreatePositionProperty) Position
 
-    add_position_field(userId string, projectId int, fieldType FieldType, name string) PositionField
+    add_position_field(accessTokenId string, projectId int, fieldType FieldType, name string) PositionField
 
-    add_positions(userId string, projectId int, positions []CreatePosition) []Position
+    add_positions(accessTokenId string, projectId int, positions []CreatePosition) []Position
 
-    add_project(userId string, projectName string) Project
+    add_project(accessTokenId string, projectName string) Project
 
     // add_project_access gives a user (by email) access to a project or can
     // be used to grant PUBLIC access. Accepts an array of emails, which can
@@ -141,13 +150,13 @@ interface SimpleMappingSystem {
     //          PUBLIC
     // * 1004 - Cannot add OWNER access for project
     //
-    add_project_access(userId string, projectId int, accessType AccessType, language Language, measurementSys MeasurementSystem, gpsFormat GPSFormat, mapType GoogleMapType, message string, emails []string) []ProjectAccess
+    add_project_access(accessTokenId string, projectId int, accessType AccessType, language Language, measurementSys MeasurementSystem, gpsFormat GPSFormat, mapType GoogleMapType, message string, emails []string) []ProjectAccess
 
-    delete_position(userId string, positionId int) bool
+    delete_position(accessTokenId string, positionId int) bool
 
-    delete_position_field(userId string, positionFieldId int) bool
+    delete_position_field(accessTokenId string, positionFieldId int) bool
 
-    delete_project(userId string, projectId int) bool
+    delete_project(accessTokenId string, projectId int) bool
 
     // delete_project_access removes a project_access row from the system. This
     // If could be tied to a user, an email, or could be a PUBLIC access. If no
@@ -158,21 +167,21 @@ interface SimpleMappingSystem {
     //
     // * 1004 - Cannot revoke OWNER access from project
     //
-    delete_project_access(userId string, projectAccessId int) bool
+    delete_project_access(accessTokenId string, projectAccessId int) bool
 
-    get_position_fields(userId string, projectId int, suppressCoreFields bool, suppressFieldTypes []FieldType) []PositionField
+    get_position_fields(accessTokenId string, projectId int, suppressCoreFields bool, suppressFieldTypes []FieldType) []PositionField
 
-    get_project_access(userId string, projectId int) []ProjectAccess
+    get_project_access(accessTokenId string, projectId int) []ProjectAccess
 
-    get_projects(userId string) []UserProject
+    get_projects(accessTokenId string) []UserProject
 
-    get_user_settings(userId string) User
+    get_user_settings(accessTokenId string) User
 
-    search_positions(userId string, projectId int, keyword string) []Position
+    search_positions(accessTokenId string, projectId int, keyword string) []Position
 
-    update_position(userId string, positionId int, properties []CreatePositionProperty) Position
+    update_position(accessTokenId string, positionId int, properties []CreatePositionProperty) Position
 
-    update_position_fields(userId string, fields []PositionField) bool
+    update_position_fields(accessTokenId string, fields []PositionField) bool
 
-    update_user_settings(userId string, defaultLanguage Language, defaultGpsFormat GPSFormat, defaultMeasurementSystem MeasurementSystem, defaultGoogleMapType GoogleMapType) bool
+    update_user_settings(accessTokenId string, defaultLanguage Language, defaultGpsFormat GPSFormat, defaultMeasurementSystem MeasurementSystem, defaultGoogleMapType GoogleMapType) bool
 }

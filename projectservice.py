@@ -4,14 +4,13 @@ import os
 import map_email
 import barrister
 
-from jsonvalidator import JSONValidator, JSONValidationError
 from utilities import dict_get, now_millis
 from db import Db
 from lepl.apps.rfc3696 import Email
 
 ############################################################################
 
-class WebService():
+class ProjectService():
 
     def __init__(self):
         db_user = dict_get(os.environ, 'DB_USER')
@@ -24,46 +23,8 @@ class WebService():
         self.env_domain = dict_get(os.environ, 'ENV_DOMAIN')
 
         self.required_position_field_names = {"core_icon", "core_latitude", "core_longitude"}
-
-    #####################################################################
-    # public methods #
-    ##################
-
-    def user_login(self, req):
-        schema = { "user_id" : "twitter-1234", "name" : "John Doe", "email" : "fake@gmail.com" }
-        self.__validate(req, schema)
-
-        # update user record with email and name
-        sql = """
-        INSERT INTO
-            users (user_id, name, email, date_created)
-        VALUES
-            (%s, %s, %s, %s)
-        ON DUPLICATE KEY UPDATE name=%s, email=%s"""
-        params = (req["user_id"], req["name"], req["email"], now_millis(), req["name"], req["email"])
-        self.db.execute(sql, params)
-
-        # update project access rows with the user_id
-        sql = """
-        UPDATE
-            project_access
-        SET
-            user_id = %s
-        WHERE
-            email = %s"""
-        params = (req["user_id"], req["email"])
-        self.db.execute(sql, params)
-
-    def user_get(self, req):
-        schema = { "user_id": "google-987987123" }
-        self.__validate(req, schema)
-        return self.__get_user(req["user_id"])
-
-    #####################################################################
-    # message handlers #
-    #####********#######
-
-    def update_position(self, user_id, position_id, properties):
+    
+    def update_position(self, access_token_id, position_id, properties):
         sql = """
         DELETE FROM
             position_properties
@@ -77,7 +38,7 @@ class WebService():
         
         return self.__get_position_by_id(position_id)
 
-    def add_position_field(self, user_id, project_id, field_type, name):
+    def add_position_field(self, access_token_id, project_id, field_type, name):
         sql = """
         SELECT
             MAX(`order`)+1 as next_order
@@ -99,21 +60,19 @@ class WebService():
         
         return dict(position_field_id=new_id, field_type=field_type, name=name, visible="Y")
 
-    def get_position_fields(self, user_id, project_id, suppress_core_fields, suppress_field_types):
+    def get_position_fields(self, access_token_id, project_id, suppress_core_fields, suppress_field_types):
         sql = """
         SELECT
             a.position_field_id, a.field_type, a.name, a.visible
         FROM
             position_fields a
-            INNER JOIN project_access b ON a.project_id = b.project_id
         WHERE
             a.project_id = %s
-            AND b.user_id = %s
         ORDER BY
             a.order
         """
         
-        params = (project_id, user_id)
+        params = (project_id)
         temp = self.db.selectAll(sql, params)
         temp_b = []
         position_fields = []
@@ -134,7 +93,7 @@ class WebService():
 
         return list(position_fields)
 
-    def get_project_access(self, user_id, project_id):
+    def get_project_access(self, access_token_id, project_id):
         sql = """
         SELECT
             a.project_access_id, a.project_id, a.user_id, a.email, a.access_type
@@ -147,13 +106,15 @@ class WebService():
         
         return list(project_access)
     
-    def get_user_settings(self, user_id):
-        user = self.__get_user(user_id)
+    def get_user_settings(self, access_token_id):
+        user = self.__get_user_by_access_token_id(access_token_id)
         user["needs_to_update_settings"] = self.__needs_to_update_settings(user)
-        
+
         return user
 
-    def update_user_settings(self, user_id, default_language, default_gps_format, default_measurement_system, default_google_map_type):
+    def update_user_settings(self, access_token_id, default_language, default_gps_format, default_measurement_system, default_google_map_type):
+        user_id = self.__get_user_by_access_token_id(access_token_id)["user_id"]
+        
         sql = """
         UPDATE
             `users`
@@ -169,7 +130,9 @@ class WebService():
 
         return True
     
-    def get_projects(self, user_id):
+    def get_projects(self, access_token_id):
+        user = self.__get_user_by_access_token_id(access_token_id)
+
         sql = """
         SELECT
             a.project_id, a.name, b.access_type
@@ -178,17 +141,19 @@ class WebService():
             INNER JOIN project_access b ON a.project_id = b.project_id
         WHERE
             b.user_id = %s"""
-        params = (user_id)       
+        params = (user.get("user_id"))       
  
         return list(self.db.selectAll(sql, params))
 
-    def add_project(self, user_id, project_name):
+    def add_project(self, access_token_id, project_name):
+        user = self.__get_user_by_access_token_id(access_token_id)
+
         sql = """
         INSERT INTO
             projects (user_id, name)
         VALUES
             (%s, %s)"""
-        params = (user_id, project_name)
+        params = (user.get("user_id"), project_name)
         new_id = self.db.insertAutoIncrementRow(sql, params)
 
         # give the user access to their own project
@@ -202,7 +167,7 @@ class WebService():
         WHERE
             a.user_id = %s
         """
-        params = (user_id, new_id, user_id)
+        params = (user.get("user_id"), new_id, user.get("user_id"))
         self.db.execute(sql, params)
 
         # add the "core" fields
@@ -217,9 +182,7 @@ class WebService():
 
         return dict(project_id=new_id,name=project_name)
 
-    def search_positions(self, user_id, project_id, keyword):
-        self.__can_view_project(project_id, user_id)
-
+    def search_positions(self, access_token_id, project_id, keyword):
         sql = """
         SELECT
             a.project_id,
@@ -288,11 +251,13 @@ class WebService():
 
         return ret
     
-    def add_position(self, user_id, project_id, properties):
+    def add_position(self, access_token_id, project_id, properties):
+        user_id = self.__get_user_by_access_token_id(access_token_id)["user_id"]
+
         if (not self.__has_required_fields(properties)):
             raise barrister.RpcException(1004, "Must include core fields")
         else:
-            if (not self.__has_valid_field_names(user_id, project_id, properties)):
+            if (not self.__has_valid_field_names(access_token_id, project_id, properties)):
                 raise barrister.RpcException(1004, "Can not include properties with names that don't correspond to fields for this project")
             else:
                 if (not self.__has_core_field_values(properties)):
@@ -309,14 +274,14 @@ class WebService():
 
                     return self.__get_position_by_id(new_position_id)
 
-    def add_positions(self, user_id, project_id, positions):
+    def add_positions(self, access_token_id, project_id, positions):
         ret  = list()
         for position in positions:
-            ret.append(self.add_position(user_id, project_id, position["position_properties"]))
+            ret.append(self.add_position(access_token_id, project_id, position["position_properties"]))
 
         return ret
 
-    def delete_position_field(self, user_id, position_field_id):
+    def delete_position_field(self, access_token_id, position_field_id):
         sql = """
         SELECT DISTINCT position_id, name
         FROM
@@ -351,11 +316,11 @@ class WebService():
 
         return True
 
-    def delete_project_access(self, user_id, project_access_id):
+    def delete_project_access(self, access_token_id, project_access_id):
         existing = self.__get_project_access_by_id(project_access_id)
 
         if (len(existing) > 0 and existing[0]["access_type"] == "OWNER"):
-            raise barrister.RpcException(1004, "Can't revoke OWNER ProjectAccess with id: %s" % user_id)
+            raise barrister.RpcException(1004, "Can't revoke OWNER ProjectAccess")
         else:
             sql = """
             DELETE FROM
@@ -368,14 +333,16 @@ class WebService():
 
             return True
 
-    def add_project_access(self, user_id, project_id, access_type, language, measurement_sys, gps_format, map_type, message, emails):
+    def add_project_access(self, access_token_id, project_id, access_type, language, measurement_sys, gps_format, map_type, message, emails):
+        user = self.__get_user_by_access_token_id(access_token_id)
+        user_id = user.get("user_id")      
+  
         if (len(emails) == 0 and access_type != "PUBLIC"):
             raise barrister.RpcException(1002, "TRANSLATE: Must specify at least one email address if access_type is not PUBLIC")
         elif (access_type == "OWNER"):
             raise barrister.RpcException(1004, "Can't add OWNER ProjectAccess")
         else:
             project_access = []
-            user = self.__get_user(user_id)
             access_type = access_type
             emails_validated = []
             link = "http://%s" % (self.env_domain)
@@ -449,7 +416,7 @@ class WebService():
             map_email.mail(to_email, [], emails_validated, "SimpleMappingSystem.com", message)
             return project_access
 
-    def delete_position(self, user_id, position_id):
+    def delete_position(self, access_token_id, position_id):
         sql = """
         DELETE FROM
             position_properties
@@ -470,7 +437,7 @@ class WebService():
 
         return True
 
-    def update_position_fields(self, user_id, position_fields):
+    def update_position_fields(self, access_token_id, position_fields):
         i = 0
         for position_field in position_fields:
             sql = """
@@ -488,7 +455,7 @@ class WebService():
 
         return True
 
-    def delete_project(self, user_id, project_id):
+    def delete_project(self, access_token_id, project_id):
         sql = """DELETE FROM project_access WHERE project_id = %s"""
         params = project_id
         self.db.execute(sql, params)
@@ -532,9 +499,9 @@ class WebService():
         
         return len(filter(lambda cp: len(cp["value"]) > 0, core_properties)) >= 3
     
-    def __has_valid_field_names(self, user_id, project_id, properties):
+    def __has_valid_field_names(self, access_token_id, project_id, properties):
         provided_names  = set(p["name"] for p in properties) 
-        available_names = set(f["name"] for f in self.get_position_fields(user_id, project_id, False, []))
+        available_names = set(f["name"] for f in self.get_position_fields(access_token_id, project_id, False, []))
 
         return len(provided_names.intersection(available_names)) >= len(provided_names)
         
@@ -561,17 +528,6 @@ class WebService():
             if email_validator(emails_unvalidated[i]):
                 emails_validated.append(emails_unvalidated[i])
         return emails_validated
-
-    def __validate(self, req, schema):
-        validator = JSONValidator(schema)
-        try:
-            validator.validate(req)
-        except JSONValidationError, e:
-            msg = "%s - Example of valid message: %s" % (str(e), str(schema))
-            raise JSONValidationError(msg)
-
-    def __is_email(self, d, key):
-        return d.has_key(key) and d[key] and d[key].find("@") > 0
 
     def __needs_to_update_settings(self, user):
         needsToUpdate = not (
@@ -610,6 +566,22 @@ class WebService():
             info[row['name']] = row['field_type']
         return info
 
+    def __get_user_by_access_token_id(self, access_token_id):
+        sql = """
+        SELECT
+            a.*
+        FROM
+            `users` a
+            INNER JOIN `logins` b ON a.user_id = b.user_id
+        WHERE
+            b.access_token=%s
+        """
+        params = (access_token_id)
+      
+        r = self.db.selectRow(sql, params) 
+        
+        return r
+
     def __get_user(self, user_id):
         sql = """
         SELECT
@@ -643,29 +615,6 @@ class WebService():
         params = (position_id)
         temp = self.db.selectRow(sql, params)
         return temp["project_id"]
-
-    def __can_view_project(self, project_id, user_id=None):
-        can_view = False
-        sql = """
-        SELECT DISTINCT
-            user_id, access_type
-        FROM
-            project_access
-        WHERE
-            project_id=%s"""
-        params = (project_id)
-        rows = self.db.selectAll(sql, params)
-        for row in rows:
-            if (user_id and row["user_id"] == user_id):
-                can_view = True
-                break
-            elif (row["access_type"] == "PUBLIC"):
-                can_view = True
-                break                
-
-        if (not can_view):
-            message = "Insufficient privileges to view project %s" % (project_id)
-            raise Exception, message
 
     def __get_position_by_id(self, position_id):
         sql = """

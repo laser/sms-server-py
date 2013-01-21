@@ -3,13 +3,16 @@
 from flask import Flask, redirect, render_template, url_for, g
 from flask import request, flash, jsonify
 from oauthlib import OAuth
-from service import WebService
+from projectservice import ProjectService
+from authservice import AuthService
+
 from cloud import CloudFilesService
 from utilities import dict_get
 
 import os
 import barrister
 import pdb
+import json
 
 app = Flask(__name__)
 app.secret_key = dict_get(os.environ, "FLASK_SECRET_KEY")
@@ -39,11 +42,12 @@ google = oauth.remote_app(
         {'scope':'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'})
 
 #################################################################
-# service #
-#########
+# services #
+############
 
 cloudFilesService = CloudFilesService()
-service  = WebService()
+projectService    = ProjectService()
+authService       = AuthService()
 
 #################################################################
 # barrister #
@@ -51,8 +55,8 @@ service  = WebService()
 
 contract = barrister.contract_from_file("sms.json")
 server   = barrister.Server(contract)
-server.add_handler("SimpleMappingSystem", service)
-
+server.add_handler("AuthService", authService)
+server.add_handler("ProjectService", projectService)
 
 #################################################################
 # request handlers #
@@ -64,7 +68,10 @@ def before_request():
 
 @app.route('/api', methods=['POST'])
 def sms():
-    return server.call_json(request.data)
+    if __authenticated(request.data):
+        return server.call_json(request.data)
+    else:
+        raise barrister.RpcException(1000, "User is not logged in")
 
 @app.route('/')
 def index():
@@ -104,12 +111,17 @@ def get_oauth_token_google():
 #################################################################
 # misc private #
 ################
+def __authenticated(request_data):
+    data = json.loads(request_data)
+    #if (data.get("method") != "barrister-idl"):
+    
+    return True
 
 def __on_login(provider, provider_user_id, name, email):
-    user_id = '%s-%s' % (provider, provider_user_id)
-    service.user_login({ 'user_id' : user_id, 'name' : name, 'email' : email })
-    user = service.user_get({ 'user_id' : user_id })
-    url = "#/private/%s/%s" % (user_id, user["default_language"])
+    user_id      = '%s-%s' % (provider, provider_user_id)
+    access_token = authService.login(user_id, email, name) 
+    user         = projectService.get_user_settings(access_token.get("access_token_id"))
+    url          = "#/private/%s/%s" % (access_token.get("token_id"), user["default_language"] or "")
     
     return redirect(url_for("index") + url);
 

@@ -1,3 +1,5 @@
+drop table if exists `logins`;
+drop table if exists `position_fields`;
 drop table if exists `custom_position_properties`;
 drop table if exists `position_properties`;
 drop table if exists `positions`;
@@ -12,8 +14,7 @@ CREATE TABLE `users` (
     date_created              bigint NOT NULL,
     default_language          enum('EN_US', 'ES_LA', 'FR_FR'),
     default_gps_format        enum('DECIMAL', 'DEGREE', 'UTMWGS84'),
-    default_measurement_system enum('METRIC', 'IMPERIAL'),
-    default_google_map_type   enum('ROADMAP', 'SATELLITE', 'HYBRID', 'TERRAIN') DEFAULT 'SATELLITE'
+    default_measurement_system enum('METRIC', 'IMPERIAL')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `projects` (
