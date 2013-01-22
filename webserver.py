@@ -119,9 +119,9 @@ def __authenticated(request_data):
 
 def __on_login(provider, provider_user_id, name, email):
     user_id      = '%s-%s' % (provider, provider_user_id)
-    access_token = authService.login(user_id, email, name) 
-    user         = projectService.get_user_settings(access_token.get("access_token_id"))
-    url          = "#/private/%s/%s" % (access_token.get("token_id"), user["default_language"] or "")
+    login_info   = authService.login(user_id, email, name) 
+    user         = projectService.get_user_settings(login_info.get("access_token"))
+    url          = "#/private/%s/%s" % (login_info.get("access_token"), user["default_language"] or "")
     
     return redirect(url_for("index") + url);
 

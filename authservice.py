@@ -63,6 +63,6 @@ class AuthService():
         self.db.execute(sql, params)
 
         return {
-            "token_id": token_id,
+            "access_token": token_id,
             "expiry_time": expiry_time
         }

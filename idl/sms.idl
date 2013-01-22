@@ -7,8 +7,8 @@
 // 1003    Not Found (Semantic way to express that we couldn't find the data requested)
 // 1004    Illegal Operation (UI should not have called this function with the given params)
 
-struct AccessToken {
-    access_token_id                    string
+struct LoginInfo {
+    access_token                string
     expiry_time                 int 
 }
 
@@ -116,7 +116,7 @@ enum GoogleMapType {
 }
 
 interface AuthService {
-    login(userId string, email string, name string) AccessToken
+    login(userId string, email string, name string) LoginInfo
 }
 
 interface ProjectService { 

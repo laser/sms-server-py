@@ -24,7 +24,7 @@ class ProjectService():
 
         self.required_position_field_names = {"core_icon", "core_latitude", "core_longitude"}
     
-    def update_position(self, access_token_id, position_id, properties):
+    def update_position(self, access_token, position_id, properties):
         sql = """
         DELETE FROM
             position_properties
@@ -38,7 +38,7 @@ class ProjectService():
         
         return self.__get_position_by_id(position_id)
 
-    def add_position_field(self, access_token_id, project_id, field_type, name):
+    def add_position_field(self, access_token, project_id, field_type, name):
         sql = """
         SELECT
             MAX(`order`)+1 as next_order
@@ -60,7 +60,7 @@ class ProjectService():
         
         return dict(position_field_id=new_id, field_type=field_type, name=name, visible="Y")
 
-    def get_position_fields(self, access_token_id, project_id, suppress_core_fields, suppress_field_types):
+    def get_position_fields(self, access_token, project_id, suppress_core_fields, suppress_field_types):
         sql = """
         SELECT
             a.position_field_id, a.field_type, a.name, a.visible
@@ -93,7 +93,7 @@ class ProjectService():
 
         return list(position_fields)
 
-    def get_project_access(self, access_token_id, project_id):
+    def get_project_access(self, access_token, project_id):
         sql = """
         SELECT
             a.project_access_id, a.project_id, a.user_id, a.email, a.access_type
@@ -106,14 +106,14 @@ class ProjectService():
         
         return list(project_access)
     
-    def get_user_settings(self, access_token_id):
-        user = self.__get_user_by_access_token_id(access_token_id)
+    def get_user_settings(self, access_token):
+        user = self.__get_user_by_access_token(access_token)
         user["needs_to_update_settings"] = self.__needs_to_update_settings(user)
 
         return user
 
-    def update_user_settings(self, access_token_id, default_language, default_gps_format, default_measurement_system, default_google_map_type):
-        user_id = self.__get_user_by_access_token_id(access_token_id)["user_id"]
+    def update_user_settings(self, access_token, default_language, default_gps_format, default_measurement_system, default_google_map_type):
+        user_id = self.__get_user_by_access_token(access_token)["user_id"]
         
         sql = """
         UPDATE
@@ -130,8 +130,8 @@ class ProjectService():
 
         return True
     
-    def get_projects(self, access_token_id):
-        user = self.__get_user_by_access_token_id(access_token_id)
+    def get_projects(self, access_token):
+        user = self.__get_user_by_access_token(access_token)
 
         sql = """
         SELECT
@@ -145,8 +145,8 @@ class ProjectService():
  
         return list(self.db.selectAll(sql, params))
 
-    def add_project(self, access_token_id, project_name):
-        user = self.__get_user_by_access_token_id(access_token_id)
+    def add_project(self, access_token, project_name):
+        user = self.__get_user_by_access_token(access_token)
 
         sql = """
         INSERT INTO
@@ -182,7 +182,7 @@ class ProjectService():
 
         return dict(project_id=new_id,name=project_name)
 
-    def search_positions(self, access_token_id, project_id, keyword):
+    def search_positions(self, access_token, project_id, keyword):
         sql = """
         SELECT
             a.project_id,
@@ -251,13 +251,13 @@ class ProjectService():
 
         return ret
     
-    def add_position(self, access_token_id, project_id, properties):
-        user_id = self.__get_user_by_access_token_id(access_token_id)["user_id"]
+    def add_position(self, access_token, project_id, properties):
+        user_id = self.__get_user_by_access_token(access_token)["user_id"]
 
         if (not self.__has_required_fields(properties)):
             raise barrister.RpcException(1004, "Must include core fields")
         else:
-            if (not self.__has_valid_field_names(access_token_id, project_id, properties)):
+            if (not self.__has_valid_field_names(access_token, project_id, properties)):
                 raise barrister.RpcException(1004, "Can not include properties with names that don't correspond to fields for this project")
             else:
                 if (not self.__has_core_field_values(properties)):
@@ -274,14 +274,14 @@ class ProjectService():
 
                     return self.__get_position_by_id(new_position_id)
 
-    def add_positions(self, access_token_id, project_id, positions):
+    def add_positions(self, access_token, project_id, positions):
         ret  = list()
         for position in positions:
-            ret.append(self.add_position(access_token_id, project_id, position["position_properties"]))
+            ret.append(self.add_position(access_token, project_id, position["position_properties"]))
 
         return ret
 
-    def delete_position_field(self, access_token_id, position_field_id):
+    def delete_position_field(self, access_token, position_field_id):
         sql = """
         SELECT DISTINCT position_id, name
         FROM
@@ -316,7 +316,7 @@ class ProjectService():
 
         return True
 
-    def delete_project_access(self, access_token_id, project_access_id):
+    def delete_project_access(self, access_token, project_access_id):
         existing = self.__get_project_access_by_id(project_access_id)
 
         if (len(existing) > 0 and existing[0]["access_type"] == "OWNER"):
@@ -333,8 +333,8 @@ class ProjectService():
 
             return True
 
-    def add_project_access(self, access_token_id, project_id, access_type, language, measurement_sys, gps_format, map_type, message, emails):
-        user = self.__get_user_by_access_token_id(access_token_id)
+    def add_project_access(self, access_token, project_id, access_type, language, measurement_sys, gps_format, map_type, message, emails):
+        user = self.__get_user_by_access_token(access_token)
         user_id = user.get("user_id")      
   
         if (len(emails) == 0 and access_type != "PUBLIC"):
@@ -416,7 +416,7 @@ class ProjectService():
             map_email.mail(to_email, [], emails_validated, "SimpleMappingSystem.com", message)
             return project_access
 
-    def delete_position(self, access_token_id, position_id):
+    def delete_position(self, access_token, position_id):
         sql = """
         DELETE FROM
             position_properties
@@ -437,7 +437,7 @@ class ProjectService():
 
         return True
 
-    def update_position_fields(self, access_token_id, position_fields):
+    def update_position_fields(self, access_token, position_fields):
         i = 0
         for position_field in position_fields:
             sql = """
@@ -455,7 +455,7 @@ class ProjectService():
 
         return True
 
-    def delete_project(self, access_token_id, project_id):
+    def delete_project(self, access_token, project_id):
         sql = """DELETE FROM project_access WHERE project_id = %s"""
         params = project_id
         self.db.execute(sql, params)
@@ -499,9 +499,9 @@ class ProjectService():
         
         return len(filter(lambda cp: len(cp["value"]) > 0, core_properties)) >= 3
     
-    def __has_valid_field_names(self, access_token_id, project_id, properties):
+    def __has_valid_field_names(self, access_token, project_id, properties):
         provided_names  = set(p["name"] for p in properties) 
-        available_names = set(f["name"] for f in self.get_position_fields(access_token_id, project_id, False, []))
+        available_names = set(f["name"] for f in self.get_position_fields(access_token, project_id, False, []))
 
         return len(provided_names.intersection(available_names)) >= len(provided_names)
         
@@ -566,7 +566,7 @@ class ProjectService():
             info[row['name']] = row['field_type']
         return info
 
-    def __get_user_by_access_token_id(self, access_token_id):
+    def __get_user_by_access_token(self, access_token):
         sql = """
         SELECT
             a.*
@@ -576,7 +576,7 @@ class ProjectService():
         WHERE
             b.access_token=%s
         """
-        params = (access_token_id)
+        params = (access_token)
       
         r = self.db.selectRow(sql, params) 
         
