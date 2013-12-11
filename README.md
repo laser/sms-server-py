@@ -4,7 +4,7 @@ SimpleMappingSystem
 About
 -----
 
-Python implementation of mapping system build while in the Peace Corps in Honduras. Supports i18n, Garmin GPS integration. Uses Google (OAuth2) for authentication, RackSpace CloudFiles for asset storage. 
+Python implementation of mapping system build while in the Peace Corps in Honduras. Supports i18n, Garmin GPS integration. Uses Google (OAuth2) for authentication, RackSpace CloudFiles for asset storage.
 
 Installation
 ------------
@@ -23,20 +23,27 @@ To install the application and its dependencies on a Mac (with brew):
 
 4. Create a virtualenv somewhere
 
+    ```
     mkdir ~/dev/sms
     cd ~/dev/sms
     virtualenv --no-site-packages
+    ```
 
 5. Check out the project:
 
+
+    ```
     cd ~/dev/sms
     git clone git://github.com/hippipp/simplemappingsystem.com.git
+    ```
 
 6. Install dependencies, with pip
 
+    ```
     cd ~/dev/sms
     source bin/activate
     pip install -r simplemappingsystem.com/requirements.txt
+    ```
 
 7. configure mysql and create a database (I called mine "radstuff")
 
