@@ -4,7 +4,9 @@ SimpleMappingSystem
 About
 -----
 
-Python implementation of mapping system build while in the Peace Corps in Honduras. Supports i18n, Garmin GPS integration. Uses Google (OAuth2) for authentication, RackSpace CloudFiles for asset storage.
+Python implementation of mapping system build while in the Peace Corps in
+Honduras. Supports i18n, Garmin GPS integration. Uses Google (OAuth2) for
+authentication, RackSpace CloudFiles for asset storage.
 
 Installation
 ------------
@@ -49,14 +51,17 @@ To install the application and its dependencies on a Mac (with brew):
 
 8. run the .sql files in the SQL directory to create a DB and apply patches:
 
+    ```
     cd ~/dev/sms/simplemappingsystem.com/sql
     mysql --user=whatever --password radstuff < schema.sql
     mysql --user=whatever --password radstuff < patch1.sql
     mysql --user=whatever --password radstuff < patch2.sql
     mysql --user=whatever --password radstuff < [...etc]
+    ```
 
 9. set environment variables
 
+    ```
     export DEBUG=True
     export HOST=127.0.0.1
     export PORT=3002
@@ -75,10 +80,13 @@ To install the application and its dependencies on a Mac (with brew):
     export SMTP_PASSWORD=somepassword
     export SMTP_SERVER=someserver.com
     export SMTP_PORT=1234
+    ```
 
 10. generate Barrister contract & docs
 
+    ```
     cd ~/dev/sms
     barrister -t "SimpleMappingSystem" -d sms.html -j sms.json idl/sms.idl
+    ```
 
 11. clone an sms client (view my other repos) into static/client and you're good to go

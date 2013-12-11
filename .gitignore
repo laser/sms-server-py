@@ -7,3 +7,8 @@ run.sh
 sms.html
 sms.json
 sql/build.sh
+.Python
+bin/
+include/
+lib/
+man/
