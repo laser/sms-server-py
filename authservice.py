@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import os
-import map_email
 import barrister
 import uuid
 
@@ -13,15 +12,8 @@ from lepl.apps.rfc3696 import Email
 
 class AuthService():
 
-    def __init__(self):
-        db_user = dict_get(os.environ, 'DB_USER')
-        db_pass = dict_get(os.environ, 'DB_PASS')
-        db_name = dict_get(os.environ, 'DB_NAME')
-        db = Db('127.0.0.1', 3306, db_user, db_pass, db_name)
-        db.verbose = False
-        self.db    = db
-        self.db.commit()
-        
+    def __init__(self, repository):
+        self.db = repository
         self.token_ttl_millis = 86400000 # 24 hours
 
     #####################################################################
@@ -49,7 +41,7 @@ class AuthService():
         WHERE
             email = %s"""
         params = (user_id, email)
-        
+
         # generate an access token
         token_id = uuid.uuid4()
         expiry_time = now_millis() + self.token_ttl_millis

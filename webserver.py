@@ -5,6 +5,8 @@ from flask import request, flash, jsonify
 from oauthlib import OAuth
 from utilities import dict_get
 
+from repository import Repository
+from db import Db
 from projectservice import ProjectService
 from authservice import AuthService
 
@@ -26,11 +28,12 @@ host        = dict_get(os.environ, 'SMS_HOST')
 port        = int(dict_get(os.environ, 'SMS_PORT'))
 
 #################################################################
-# garmin communicator #
-#######################
+# db config #
+#############
 
-garmin_domain = dict_get(os.environ, 'SMS_GARMIN_DOMAIN')
-garmin_key    = dict_get(os.environ, 'SMS_GARMIN_KEY')
+db_user = dict_get(os.environ, 'SMS_DB_USER')
+db_pass = dict_get(os.environ, 'SMS_DB_PASS')
+db_name = dict_get(os.environ, 'SMS_DB_NAME')
 
 #################################################################
 # smtp #
@@ -83,16 +86,18 @@ if environment == 'test':
     class FakeHostingService(HostingService):
         def host_file(*arg): None
 
-    hostingService = FakeHostingService()
-    mailService    = FakeEmailService()
+    hosting_service = FakeHostingService()
+    mail_service    = FakeEmailService()
 else:
     from smtpservice import SMTPService
     from cloud import CloudFilesService
-    hostingService  = CloudFilesService(cloud_user, cloud_api_key, cloud_container_name)
-    mailService     = SMTPService(smtp_user, smtp_password, smtp_server, smtp_port)
+    hosting_service = CloudFilesService(cloud_user, cloud_api_key, cloud_container_name)
+    mail_service    = SMTPService(smtp_user, smtp_password, smtp_server, smtp_port)
 
-projectService  = ProjectService(mailService)
-authService     = AuthService()
+db             = Db('127.0.0.1', 3306, db_user, db_pass, db_name)
+repository     = Repository(db, mail_service)
+projectService = ProjectService(mail_service, repository)
+authService    = AuthService(repository)
 
 #################################################################
 # barrister #
@@ -171,7 +176,7 @@ def __on_login(provider, provider_user_id, name, email):
     return redirect(url_for('index') + url);
 
 def __host_file(file):
-    file_uri = hostingService.host_file(file)
+    file_uri = hosting_service.host_file(file)
     return file_uri
 
 #################################################################

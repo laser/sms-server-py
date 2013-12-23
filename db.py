@@ -18,6 +18,8 @@ class Db:
         self.log = logging.getLogger()
         self._test_process_time = 0
         self.connect()
+        self.verbose = False
+        self.commit()
 
     def close(self):
         self.conn.close()
