@@ -92,3 +92,13 @@ To install the application and its dependencies on a Mac (with brew):
     ```
 
 11. clone an sms client (view my other repos) into static/client and you're good to go
+
+Testing
+-------
+
+The tests have been written against the JSON-RPC API and require that you have a
+running SMS server to point them at. Check them out here:
+
+```
+https://github.com/laser/simplemappingsystem-tests
+```
