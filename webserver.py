@@ -7,9 +7,6 @@ from utilities import dict_get
 
 from projectservice import ProjectService
 from authservice import AuthService
-from map_email import SMTPService
-from cloud import CloudFilesService
-
 
 import os
 import barrister
@@ -23,9 +20,10 @@ app.secret_key = dict_get(os.environ, 'SMS_FLASK_SECRET_KEY')
 # app config #
 ##############
 
-debug = bool(dict_get(os.environ, 'SMS_DEBUG'))
-host  = dict_get(os.environ, 'SMS_HOST')
-port  = int(dict_get(os.environ, 'SMS_PORT'))
+environment = dict_get(os.environ, 'SMS_ENVIRONMENT')
+debug       = bool(dict_get(os.environ, 'SMS_DEBUG'))
+host        = dict_get(os.environ, 'SMS_HOST')
+port        = int(dict_get(os.environ, 'SMS_PORT'))
 
 #################################################################
 # garmin communicator #
@@ -75,8 +73,24 @@ google = oauth.remote_app(
 # services #
 ############
 
-hostingService  = CloudFilesService(cloud_user, cloud_api_key, cloud_container_name)
-mailService     = SMTPService(smtp_user, smtp_password, smtp_server, smtp_port)
+if environment == 'test':
+    from hostingservice import HostingService
+    from mailservice import MailService
+
+    class FakeEmailService(MailService):
+        def mail(*arg): None
+
+    class FakeHostingService(HostingService):
+        def host_file(*arg): None
+
+    hostingService = FakeHostingService()
+    mailService    = FakeEmailService()
+else:
+    from smtpservice import SMTPService
+    from cloud import CloudFilesService
+    hostingService  = CloudFilesService(cloud_user, cloud_api_key, cloud_container_name)
+    mailService     = SMTPService(smtp_user, smtp_password, smtp_server, smtp_port)
+
 projectService  = ProjectService(mailService)
 authService     = AuthService()
 
