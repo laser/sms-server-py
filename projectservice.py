@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import os
-import map_email
 import barrister
 
 from utilities import dict_get, now_millis
@@ -12,7 +11,7 @@ from lepl.apps.rfc3696 import Email
 
 class ProjectService():
 
-    def __init__(self):
+    def __init__(self, mail_service=None):
         db_user = dict_get(os.environ, 'DB_USER')
         db_pass = dict_get(os.environ, 'DB_PASS')
         db_name = dict_get(os.environ, 'DB_NAME')
@@ -21,9 +20,10 @@ class ProjectService():
         self.db    = db
         self.db.commit()
         self.env_domain = dict_get(os.environ, 'ENV_DOMAIN')
+        self.mail_service = mail_service
 
         self.required_position_field_names = {"core_icon", "core_latitude", "core_longitude"}
-    
+
     def update_position(self, access_token, position_id, properties):
         sql = """
         DELETE FROM
@@ -35,7 +35,7 @@ class ProjectService():
         self.db.execute(sql, params)
         project_id = self.__get_project_id_by_position_id(position_id)
         self.__create_position_properties(project_id, position_id, properties)
-        
+
         return self.__get_position_by_id(position_id)
 
     def add_position_field(self, access_token, project_id, field_type, name):
@@ -57,7 +57,7 @@ class ProjectService():
             (%s, %s, %s, %s, %s)"""
         params = (project_id, name, field_type, "Y", next_order)
         new_id = self.db.insertAutoIncrementRow(sql, params)
-        
+
         return dict(position_field_id=new_id, field_type=field_type, name=name, visible="Y")
 
     def get_position_fields(self, access_token, project_id, suppress_core_fields, suppress_field_types):
@@ -71,7 +71,7 @@ class ProjectService():
         ORDER BY
             a.order
         """
-        
+
         params = (project_id)
         temp = self.db.selectAll(sql, params)
         temp_b = []
@@ -103,9 +103,9 @@ class ProjectService():
             a.project_id = %s"""
         params = (project_id)
         project_access = self.db.selectAll(sql, params)
-        
+
         return list(project_access)
-    
+
     def get_user_settings(self, access_token):
         user = self.__get_user_by_access_token(access_token)
         user["needs_to_update_settings"] = self.__needs_to_update_settings(user)
@@ -114,7 +114,7 @@ class ProjectService():
 
     def update_user_settings(self, access_token, default_language, default_gps_format, default_measurement_system, default_google_map_type):
         user_id = self.__get_user_by_access_token(access_token)["user_id"]
-        
+
         sql = """
         UPDATE
             `users`
@@ -129,7 +129,7 @@ class ProjectService():
         self.db.execute(sql, params)
 
         return True
-    
+
     def get_projects(self, access_token):
         user = self.__get_user_by_access_token(access_token)
 
@@ -141,8 +141,8 @@ class ProjectService():
             INNER JOIN project_access b ON a.project_id = b.project_id
         WHERE
             b.user_id = %s"""
-        params = (user.get("user_id"))       
- 
+        params = (user.get("user_id"))
+
         return list(self.db.selectAll(sql, params))
 
     def add_project(self, access_token, project_name):
@@ -225,8 +225,8 @@ class ProjectService():
         rows = self.db.selectAll(sql, params)
 
         positions = dict()
-        ret       = list() 
-        
+        ret       = list()
+
         for row in rows:
             if not positions.has_key(row["position_id"]):
                 positions[row["position_id"]] = dict()
@@ -250,7 +250,7 @@ class ProjectService():
             ret.append(positions[key])
 
         return ret
-    
+
     def add_position(self, access_token, project_id, properties):
         user_id = self.__get_user_by_access_token(access_token)["user_id"]
 
@@ -335,8 +335,8 @@ class ProjectService():
 
     def add_project_access(self, access_token, project_id, access_type, language, measurement_sys, gps_format, map_type, message, emails):
         user = self.__get_user_by_access_token(access_token)
-        user_id = user.get("user_id")      
-  
+        user_id = user.get("user_id")
+
         if (len(emails) == 0 and access_type != "PUBLIC"):
             raise barrister.RpcException(1002, "TRANSLATE: Must specify at least one email address if access_type is not PUBLIC")
         elif (access_type == "OWNER"):
@@ -385,7 +385,7 @@ class ProjectService():
             else:
                 link = "http://%s/#/public/%s/%s/%s/%s/%s" % (self.env_domain, language, gps_format, measurement_sys, project_id, map_type)
                 to_email = user["email"]
-                
+
                 # wipe previous public-access entry, if exists
                 sql = """
                 DELETE FROM
@@ -413,7 +413,7 @@ class ProjectService():
                 ))
 
             message = u"""%s:\n\r%s\n\r%s""" % (user["name"], message, link)
-            map_email.mail(to_email, [], emails_validated, "SimpleMappingSystem.com", message)
+            self.mail_service.mail(to_email, [], emails_validated, "SimpleMappingSystem.com", message)
             return project_access
 
     def delete_position(self, access_token, position_id):
@@ -496,15 +496,15 @@ class ProjectService():
 
     def __has_core_field_values(self, properties):
         core_properties = filter(lambda p: p["name"] in self.required_position_field_names, properties)
-        
+
         return len(filter(lambda cp: len(cp["value"]) > 0, core_properties)) >= 3
-    
+
     def __has_valid_field_names(self, access_token, project_id, properties):
-        provided_names  = set(p["name"] for p in properties) 
+        provided_names  = set(p["name"] for p in properties)
         available_names = set(f["name"] for f in self.get_position_fields(access_token, project_id, False, []))
 
         return len(provided_names.intersection(available_names)) >= len(provided_names)
-        
+
     def __get_project_access_by_id(self, project_access_id):
         sql = """
         SELECT
@@ -513,14 +513,14 @@ class ProjectService():
             project_access a
         WHERE
             a.project_access_id = %s"""
-        
+
         return list(self.db.selectAll(sql, project_access_id))
 
     def __has_required_fields(self, properties):
         provided_names  = set(p["name"] for p in properties)
-        
+
         return len(provided_names.intersection(self.required_position_field_names)) >= 3
-    
+
     def __strip_bad_emails(self, emails_unvalidated):
         email_validator = Email()
         emails_validated = []
@@ -577,9 +577,9 @@ class ProjectService():
             b.access_token=%s
         """
         params = (access_token)
-      
-        r = self.db.selectRow(sql, params) 
-        
+
+        r = self.db.selectRow(sql, params)
+
         return r
 
     def __get_user(self, user_id):
