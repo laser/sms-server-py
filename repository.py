@@ -1,12 +1,5 @@
 #!/usr/bin/env python
 
-import os
-import barrister
-import code
-
-from utilities import dict_get, now_millis
-from lepl.apps.rfc3696 import Email
-
 ############################################################################
 
 class Repository():
@@ -14,7 +7,6 @@ class Repository():
     def __init__(self, db, mail_service):
         self.db = db
         self.mail_service = mail_service
-        self.env_domain = dict_get(os.environ, 'SMS_ENV_DOMAIN')
         self.required_position_field_names = {"core_icon", "core_latitude", "core_longitude"}
 
     def delete_position_field(self, position_field_id):
