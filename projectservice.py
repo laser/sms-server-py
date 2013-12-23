@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import os
-import map_email
 import barrister
 
 from utilities import dict_get, now_millis
@@ -12,7 +11,7 @@ from lepl.apps.rfc3696 import Email
 
 class ProjectService():
 
-    def __init__(self):
+    def __init__(self, mail_service=None):
         db_user = dict_get(os.environ, 'DB_USER')
         db_pass = dict_get(os.environ, 'DB_PASS')
         db_name = dict_get(os.environ, 'DB_NAME')
@@ -21,9 +20,10 @@ class ProjectService():
         self.db    = db
         self.db.commit()
         self.env_domain = dict_get(os.environ, 'ENV_DOMAIN')
+        self.mail_service = mail_service
 
         self.required_position_field_names = {"core_icon", "core_latitude", "core_longitude"}
-    
+
     def update_position(self, access_token, position_id, properties):
         sql = """
         DELETE FROM
@@ -413,7 +413,7 @@ class ProjectService():
                 ))
 
             message = u"""%s:\n\r%s\n\r%s""" % (user["name"], message, link)
-            map_email.mail(to_email, [], emails_validated, "SimpleMappingSystem.com", message)
+            self.mail_service.mail(to_email, [], emails_validated, "SimpleMappingSystem.com", message)
             return project_access
 
     def delete_position(self, access_token, position_id):
