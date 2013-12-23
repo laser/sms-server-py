@@ -3,24 +3,23 @@
 import cloudfiles
 import uuid
 import os
+from hostingservice import HostingService
 
 ############################################################################
 from utilities import dict_get
 
-class CloudFilesService():
+class CloudFilesService(HostingService):
 
-    def __init__(self):
-        cf_user                 = dict_get(os.environ, 'CLOUDFILES_USER')
-        cf_api_key              = dict_get(os.environ, 'CLOUDFILES_API_KEY')
-        self.conn               = cloudfiles.get_connection(username=cf_user, api_key=cf_api_key, timeout=15)
-        self._container         = self.conn.get_container(dict_get(os.environ, 'CLOUDFILES_CONTAINER_NAME'))
+    def __init__(self, cloud_user, cloud_api_key, cloud_container_name):
+        self.conn               = cloudfiles.get_connection(username=cloud_user, api_key=cloud_api_key, timeout=15)
+        self._container         = self.conn.get_container(cloud_container_name)
         self._test_process_time = 0
 
     #####################################################################
     # public methods #
     ##################
 
-    def save_file_to_rackspace(self, file, retries=3):
+    def host_file(self, file, retries=3):
         if retries > 0:
             container = self.__get_rackspace_storage_container()
             obj = container.create_object(str(uuid.uuid4()))
@@ -33,14 +32,7 @@ class CloudFilesService():
             return obj.public_uri()
         else:
             raise Exception("Unable to save file (" + file + ") to CloudFiles storage.")
-            
 
-    def get_uri_list(self):
-        container = self.__get_rackspace_storage_container()
-        files = []
-        for object in container.get_objects():
-            files.append(dict(uri=object.public_uri()))
-        return files
 
     #####################################################################
     # private methods #
