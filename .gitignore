@@ -1,4 +1,5 @@
 run.sh
+*.dev
 *.swp
 *.pyc
 *.iml
