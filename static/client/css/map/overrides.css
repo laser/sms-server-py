@@ -1,0 +1,94 @@
+body .ui-dialog .ui-dialog-titlebar a.ui-dialog-titlebar-close {
+    display: none;
+}
+
+body .ui-dialog .ui-dialog-buttonpane {
+    padding: 0.3em 1em 0.5em;
+}
+
+body .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset {
+    float: none;
+}
+
+body .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset button {
+    margin-right: 0;
+}
+
+body .ui-widget .ui-widget {
+    font-size: 1.1em;
+}
+
+body .image-multi .uploadifyQueue {
+    display: inline;
+}
+
+body .uploadifyQueue .uploadifyQueueItem {
+    background-color: #F5F5F5;
+    border: none;
+    color: #000000;
+    float: left;
+    height: 19px;
+    margin: 0;
+    padding: 1%;
+    width: 7%;
+}
+
+body .image-multi .uploadifyQueue .uploadifyQueueItem .percentage {
+    display: none;
+}
+
+body .image-multi .uploadifyQueue .uploadifyQueueItem .fileName {
+    display: none;
+}
+
+body .image-multi .uploadifyQueue .uploadifyQueueItem .cancel {
+    display: none;
+}
+
+body .image-multi .uploadifyQueue .uploadifyQueueItem {
+    background-image: url(../../img/archivo.png);
+    height: 30px;
+    padding: 0;
+    margin-bottom: 9px;
+    margin-right: 9px;
+    width: 30px;
+}
+
+body .image-multi .uploadifyQueue .uploadifyQueueItem.uploadifyError {
+    background-image: url(../../img/archivo.png);
+    background-position: -2px 50%;
+    border: 2px solid red;
+    height: 26px;
+    margin-bottom: 9px;
+    margin-right: 9px;
+    width: 26px;
+}
+
+body .image-multi .uploadifyQueue .uploadifyQueueItem .uploadifyProgress {
+    margin-top: 27px;
+}
+
+body .image-multi .uploadifyQueue .uploadifyQueueItem.completed {
+    background-image: url(../../img/cheque.png);
+}
+
+body .uploadifyQueue .uploadifyQueueItem.uploadifyError {
+    border: none;
+}
+
+body .uploadifyQueue .uploadifyQueueItem.completed .cancel {
+    display: none;
+}
+
+body .image-single .uploadifyQueue {
+    float: left;
+    width: 545px;
+}
+
+body .image-single .uploadifyQueue .uploadifyQueueItem {
+    width: 537px;
+}
+
+body .image-single .uploadifyQueue .uploadifyQueueItem .uploadifyProgress {
+    margin-top: 1px;
+}
