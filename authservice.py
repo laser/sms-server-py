@@ -12,8 +12,8 @@ from lepl.apps.rfc3696 import Email
 
 class AuthService():
 
-    def __init__(self, repository):
-        self.db = repository
+    def __init__(self, db):
+        self.db = db
         self.token_ttl_millis = 86400000 # 24 hours
 
     #####################################################################
@@ -29,7 +29,7 @@ class AuthService():
         VALUES
             (%s, %s, %s, %s)
         ON DUPLICATE KEY UPDATE name=%s, email=%s"""
-        params = (user_id, name, email, now_millis(), name, email)
+        params = [user_id, name, email, now_millis(), name, email]
         self.db.execute(sql, params)
 
         # update project access rows with the user_id
@@ -40,7 +40,7 @@ class AuthService():
             user_id = %s
         WHERE
             email = %s"""
-        params = (user_id, email)
+        params = [user_id, email]
 
         # generate an access token
         token_id = uuid.uuid4()
@@ -51,7 +51,7 @@ class AuthService():
         VALUES
             (%s, %s, %s)
         """
-        params = (token_id, user_id, expiry_time)
+        params = [token_id, user_id, expiry_time]
         self.db.execute(sql, params)
 
         return {
