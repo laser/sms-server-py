@@ -109,7 +109,7 @@ def index():
 
 @app.route('/upload', methods=['POST', 'GET'])
 def upload():
-    return jsonify(dict(status='success', uri=__host_file(request.files['Filedata'])))
+    return json.dumps(dict(status='success', uri=__host_file(flask.request.files['Filedata'])))
 
 @app.route('/favicon.ico')
 def favicon():
