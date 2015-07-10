@@ -34,9 +34,7 @@ port        = int(dict_get(os.environ, 'SMS_PORT'))
 # db config #
 #############
 
-db_user = dict_get(os.environ, 'SMS_DB_USER')
-db_pass = dict_get(os.environ, 'SMS_DB_PASS')
-db_name = dict_get(os.environ, 'SMS_DB_NAME')
+db_url = dict_get(os.environ, 'DATABASE_URL')
 
 #################################################################
 # smtp #
@@ -78,7 +76,7 @@ else:
     hosting_service = CloudFilesService(cloud_user, cloud_api_key, cloud_container_name)
     mail_service    = SMTPService(smtp_user, smtp_password, smtp_server, smtp_port)
 
-db             = Db('127.0.0.1', 3306, db_user, db_pass, db_name)
+db             = Db(db_url)
 repository     = Repository(db, mail_service)
 projectService = ProjectService(env_domain, mail_service, repository)
 authService    = AuthService(db)

@@ -2,18 +2,23 @@ import MySQLdb
 import MySQLdb.cursors
 import logging
 import utilities
+import urlparse
 
 class Db:
 
     verbose = False
 
-    def __init__(self, hostname, port, username, password, dbname,
-                 use_unicode=True):
-        self.host = hostname
-        self.port = port
-        self.user = username
-        self.password = password
-        self.dbname = dbname
+    def __init__(self, db_url, use_unicode=True):
+        parsed = urlparse.urlparse(db_url)
+
+        db_name = db_url.split("/")[-1].split("?")[0]
+
+        self.host = parsed.hostname
+        self.port = parsed.port if parsed.port else 3306
+        self.user = parsed.username
+        self.password = parsed.password
+        self.dbname = db_name
+
         self.use_unicode = use_unicode
         self.log = logging.getLogger()
         self._test_process_time = 0
@@ -25,8 +30,10 @@ class Db:
         self.conn.close()
 
     def connect(self):
-        self.conn = MySQLdb.connect(host=self.host, port=self.port,
-                                    user=self.user, passwd=self.password,
+        self.conn = MySQLdb.connect(host=self.host, 
+                                    port=self.port,
+                                    user=self.user, 
+                                    passwd=self.password,
                                     db=self.dbname,
                                     cursorclass=MySQLdb.cursors.DictCursor,
                                     use_unicode=self.use_unicode)
