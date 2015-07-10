@@ -18,7 +18,7 @@ class Repository():
         WHERE
             position_field_id = %s
         """
-        params = (position_field_id)
+        params = [position_field_id]
         rows = self.db.selectAll(sql, params)
 
         for row in rows:
@@ -30,7 +30,7 @@ class Repository():
                 AND name = %s
 
             """
-            params = (row["position_id"], row["name"])
+            params = [row["position_id"], row["name"]]
             self.db.execute(sql, params)
 
         sql = """
@@ -39,7 +39,7 @@ class Repository():
         WHERE
             position_field_id = %s
         """
-        params = (position_field_id)
+        params = [position_field_id]
         self.db.execute(sql, params)
 
         return True
@@ -67,7 +67,7 @@ class Repository():
             ORDER BY
                 b.position_id,
                 d.order"""
-            params = (project_id)
+            params = [project_id]
         else:
             sql += """
                 a.project_id = %s
@@ -82,18 +82,18 @@ class Repository():
             ORDER BY
                 b.position_id,
                 d.order"""
-            params = (project_id, "%" + keyword + "%")
+            params = [project_id, "%" + keyword + "%"]
 
         return self.db.selectAll(sql, params)
 
 
     def delete_project(self, project_id):
         sql = """DELETE FROM project_access WHERE project_id = %s"""
-        params = project_id
+        params = [project_id]
         self.db.execute(sql, params)
 
         sql = """DELETE FROM position_fields WHERE project_id = %s"""
-        params = project_id
+        params = [project_id]
         self.db.execute(sql, params)
 
         sql = """
@@ -109,15 +109,15 @@ class Repository():
                     positions.project_id = %s
             )
         """
-        params = project_id
+        params = [project_id]
         self.db.execute(sql, params)
 
         sql = """DELETE FROM positions WHERE project_id = %s"""
-        params = project_id
+        params = [project_id]
         self.db.execute(sql, params)
 
         sql = """DELETE FROM projects WHERE project_id = %s"""
-        params = project_id
+        params = [project_id]
         self.db.execute(sql, params)
 
         return True
@@ -132,7 +132,7 @@ class Repository():
         WHERE
             position_field_id = %s
         """
-        params = (visible, order, position_field_id)
+        params = [visible, order, position_field_id]
         self.db.execute(sql, params)
 
     def delete_position(self, position_id):
@@ -142,7 +142,7 @@ class Repository():
         WHERE
             position_id = %s
         """
-        params = (position_id)
+        params = [position_id]
         self.db.execute(sql, params)
 
         sql = """
@@ -151,7 +151,7 @@ class Repository():
         WHERE
             position_id = %s
         """
-        params = (position_id)
+        params = [position_id]
         self.db.execute(sql, params)
 
         return True
@@ -164,7 +164,7 @@ class Repository():
             `users`
         WHERE
             email=%s"""
-        params = (email)
+        params = [email]
         return self.db.selectRow(sql, params)
 
     def delete_position_property(self, position_id):
@@ -174,7 +174,7 @@ class Repository():
         WHERE
             position_id = %s
         """
-        params = (position_id)
+        params = [position_id]
         self.db.execute(sql, params)
 
     def get_next_position_field_order(self, project_id):
@@ -185,7 +185,7 @@ class Repository():
             position_fields
         WHERE
             project_id=%s"""
-        params = (project_id)
+        params = [project_id]
         row = self.db.selectRow(sql, params)
         next_order = row["next_order"]
         return next_order
@@ -202,7 +202,7 @@ class Repository():
             a.order
         """
 
-        params = (project_id)
+        params = [project_id]
         return list(self.db.selectAll(sql, params))
 
     def get_project_access_by_project_id(self, project_id):
@@ -213,7 +213,7 @@ class Repository():
             project_access a
         WHERE
             a.project_id = %s"""
-        params = (project_id)
+        params = [project_id]
         project_access = self.db.selectAll(sql, params)
 
         return list(project_access)
@@ -230,7 +230,7 @@ class Repository():
         WHERE
             user_id = %s"""
 
-        params = (default_language, default_gps_format, default_measurement_system, default_google_map_type, user_id)
+        params = [default_language, default_gps_format, default_measurement_system, default_google_map_type, user_id]
         self.db.execute(sql, params)
 
         return True
@@ -244,7 +244,7 @@ class Repository():
             INNER JOIN project_access b ON a.project_id = b.project_id
         WHERE
             b.user_id = %s"""
-        params = (user_id)
+        params = [user_id]
 
         return list(self.db.selectAll(sql, params))
 
@@ -254,7 +254,7 @@ class Repository():
             projects (user_id, name)
         VALUES
             (%s, %s)"""
-        params = (user_id, project_name)
+        params = [user_id, project_name]
 
         return self.db.insertAutoIncrementRow(sql, params)
 
@@ -268,7 +268,7 @@ class Repository():
             VALUES
                 (%s, %s, %s, %s)
             """
-            params = (email, user_id, project_id, access_type)
+            params = [email, user_id, project_id, access_type]
         elif (user_id != None and email == None):
             sql = """
             INSERT INTO
@@ -276,7 +276,7 @@ class Repository():
             VALUES
                 (%s, %s, %s)
             """
-            params = (user_id, project_id, access_type)
+            params = [user_id, project_id, access_type]
         elif (user_id == None and email != None):
             sql = """
             INSERT INTO
@@ -284,7 +284,7 @@ class Repository():
             VALUES
                 (%s, %s, %s)
             """
-            params = (email, project_id, access_type)
+            params = [email, project_id, access_type]
         else:
             sql = """
             INSERT INTO
@@ -292,7 +292,7 @@ class Repository():
             VALUES
                 (%s, %s)
             """
-            params = (project_id, access_type)
+            params = [project_id, access_type]
 
         return self.db.insertAutoIncrementRow(sql, params)
 
@@ -303,7 +303,7 @@ class Repository():
         VALUES
             (%s, %s, %s, %s, %s)
         """
-        params = (project_id, name, field_type, order, visible)
+        params = [project_id, name, field_type, order, visible]
         new_id = self.db.insertAutoIncrementRow(sql, params)
 
         return dict(position_field_id=new_id, field_type=field_type, name=name, visible=visible)
@@ -315,7 +315,7 @@ class Repository():
         VALUES
             (%s, %s)"""
 
-        params = (user_id, project_id)
+        params = [user_id, project_id]
         return self.db.insertAutoIncrementRow(sql, params)
 
     def delete_project_access(self, project_access_id):
@@ -325,7 +325,7 @@ class Repository():
         WHERE
             project_access.project_access_id = %s
         """
-        params = (project_access_id)
+        params = [project_access_id]
         self.db.execute(sql, params)
 
         return True
@@ -340,7 +340,7 @@ class Repository():
         WHERE
             b.access_token=%s
         """
-        params = (access_token)
+        params = [access_token]
 
         return self.db.selectRow(sql, params)
 
@@ -354,7 +354,7 @@ class Repository():
         WHERE
             a.project_id = %s
         """
-        rows = self.db.selectAll(sql, project_id)
+        rows = self.db.selectAll(sql, [project_id])
         info = dict()
         for row in rows:
             info[row['name']] = row['field_type']
@@ -367,7 +367,7 @@ class Repository():
             position_properties (position_id, field_type, name, value)
         VALUES
             (%s, %s, %s, %s)"""
-        params      = (position_id, field_type, name, value)
+        params      = [position_id, field_type, name, value]
         property_id = self.db.insertAutoIncrementRow(sql, params)
 
         return property_id
@@ -380,7 +380,7 @@ class Repository():
             positions
         WHERE
             position_id=%s"""
-        params = (position_id)
+        params = [position_id]
         temp = self.db.selectRow(sql, params)
         return temp["project_id"]
 
@@ -393,7 +393,7 @@ class Repository():
         WHERE
             a.project_access_id = %s"""
 
-        return list(self.db.selectAll(sql, project_access_id))
+        return list(self.db.selectAll(sql, [project_access_id]))
 
     def get_position_by_id(self, position_id):
         sql = """
@@ -415,6 +415,6 @@ class Repository():
         ORDER BY
             d.order"""
 
-        params = (position_id)
+        params = [position_id]
 
         return self.db.selectAll(sql, params)

@@ -42,7 +42,7 @@ class SMTPService(MailService):
                 break
 
         # Make sure email addresses do not contain non-ASCII characters
-        sender_addr = smtp_user.encode('ascii')
+        sender_addr = self.smtp_user.encode('ascii')
         toaddrs = [to] + cc + bcc
 
         # Create the message ('plain' stands for Content-Type: text/plain)
@@ -51,10 +51,10 @@ class SMTPService(MailService):
         msg['To'] = to
         msg['Subject'] = Header(unicode(subject), header_charset)
 
-        smtp = SMTP(smtp_server, smtp_port)
+        smtp = SMTP(self.smtp_server, self.smtp_port)
         smtp.ehlo()
         smtp.starttls()
         smtp.ehlo()
-        smtp.login(smtp_user, smtp_password)
-        smtp.sendmail(smtp_user, toaddrs, msg.as_string())
+        smtp.login(self.smtp_user, self.smtp_password)
+        smtp.sendmail(self.smtp_user, toaddrs, msg.as_string())
         smtp.close()
