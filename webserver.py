@@ -4,6 +4,7 @@
 from utilities import dict_get
 from oauth2client import client
 from apiclient import discovery
+from werkzeug.contrib.fixers import ProxyFix
 
 import os
 import barrister
@@ -20,15 +21,13 @@ from authservice import AuthService
 
 app = flask.Flask(__name__)
 app.secret_key = dict_get(os.environ, 'SMS_FLASK_SECRET_KEY')
+app.wsgi_app = ProxyFix(app.wsgi_app)
 
 #################################################################
 # app config #
 ##############
 
 environment = dict_get(os.environ, 'SMS_ENVIRONMENT')
-debug       = bool(dict_get(os.environ, 'SMS_DEBUG'))
-host        = dict_get(os.environ, 'SMS_HOST')
-port        = int(dict_get(os.environ, 'SMS_PORT'))
 
 #################################################################
 # db config #
@@ -167,5 +166,4 @@ def __host_file(file):
 ########
 
 if __name__ == '__main__':
-    print 'Running Flask server [%s, %s, %s]' % (debug, host, port)
-    app.run(debug=debug, host=host, port=port)
+    app.run()
