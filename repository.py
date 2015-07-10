@@ -354,7 +354,7 @@ class Repository():
         WHERE
             a.project_id = %s
         """
-        rows = self.db.selectAll(sql, project_id)
+        rows = self.db.selectAll(sql, [project_id])
         info = dict()
         for row in rows:
             info[row['name']] = row['field_type']
@@ -393,7 +393,7 @@ class Repository():
         WHERE
             a.project_access_id = %s"""
 
-        return list(self.db.selectAll(sql, project_access_id))
+        return list(self.db.selectAll(sql, [project_access_id]))
 
     def get_position_by_id(self, position_id):
         sql = """

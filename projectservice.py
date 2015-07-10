@@ -11,10 +11,10 @@ from lepl.apps.rfc3696 import Email
 
 class ProjectService():
 
-    def __init__(self, mail_service, repository):
+    def __init__(self, env_domain, mail_service, repository):
         self.repository = repository
         self.mail_service = mail_service
-        self.env_domain = dict_get(os.environ, 'SMS_ENV_DOMAIN')
+        self.env_domain = env_domain
         self.required_position_field_names = {"core_icon", "core_latitude", "core_longitude"}
 
     def add_position(self, access_token, project_id, properties):

@@ -1,21 +1,24 @@
 #!/usr/bin/env python
 
-from flask import Flask, redirect, render_template, url_for, g
-from flask import request, flash, jsonify
-from oauthlib import OAuth
+# third-party libs
 from utilities import dict_get
+from oauth2client import client
+from apiclient import discovery
 
+import os
+import barrister
+import pdb
+import flask
+import json
+import httplib2
+
+# internal libs
 from repository import Repository
 from db import Db
 from projectservice import ProjectService
 from authservice import AuthService
 
-import os
-import barrister
-import pdb
-import json
-
-app = Flask(__name__)
+app = flask.Flask(__name__)
 app.secret_key = dict_get(os.environ, 'SMS_FLASK_SECRET_KEY')
 
 #################################################################
@@ -39,6 +42,7 @@ db_name = dict_get(os.environ, 'SMS_DB_NAME')
 # smtp #
 ########
 
+env_domain    = dict_get(os.environ, 'SMS_ENV_DOMAIN')
 smtp_user     = dict_get(os.environ, 'SMS_SMTP_USER')
 smtp_password = dict_get(os.environ, 'SMS_SMTP_PASSWORD')
 smtp_server   = dict_get(os.environ, 'SMS_SMTP_SERVER')
@@ -51,26 +55,6 @@ smtp_port     = dict_get(os.environ, 'SMS_SMTP_PORT')
 cloud_user           = dict_get(os.environ, 'SMS_CLOUDFILES_USER')
 cloud_api_key        = dict_get(os.environ, 'SMS_CLOUDFILES_API_KEY')
 cloud_container_name = dict_get(os.environ, 'SMS_CLOUDFILES_CONTAINER_NAME')
-
-#################################################################
-# oauth #
-#########
-
-oauth_consumer_key    = dict_get(os.environ, 'SMS_OAUTH_CONSUMER_KEY')
-oauth_consumer_secret = dict_get(os.environ, 'SMS_OAUTH_CONSUMER_SECRET')
-
-oauth = OAuth()
-
-google = oauth.remote_app(
-    'google',
-    base_url='https://www.googleapis.com/auth/',
-    request_token_url='https://www.google.com/accounts/OAuthGetRequestToken',
-    access_token_url='https://www.google.com/accounts/OAuthGetAccessToken',
-    authorize_url='https://www.google.com/accounts/OAuthAuthorizeToken',
-    consumer_key=oauth_consumer_key,
-    consumer_secret=oauth_consumer_secret,
-    request_token_params =
-        {'scope':'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'})
 
 #################################################################
 # services #
@@ -96,8 +80,8 @@ else:
 
 db             = Db('127.0.0.1', 3306, db_user, db_pass, db_name)
 repository     = Repository(db, mail_service)
-projectService = ProjectService(mail_service, repository)
-authService    = AuthService(repository)
+projectService = ProjectService(env_domain, mail_service, repository)
+authService    = AuthService(db)
 
 #################################################################
 # barrister #
@@ -112,14 +96,10 @@ server.add_handler('ProjectService', projectService)
 # request handlers #
 ####################
 
-@app.before_request
-def before_request():
-    g.user = None
-
 @app.route('/api', methods=['POST'])
-def sms():
-    if __authenticated(request.data):
-        return server.call_json(request.data)
+def api():
+    if __authenticated(flask.request.data):
+        return server.call_json(flask.request.data)
     else:
         raise barrister.RpcException(1000, 'User is not logged in')
 
@@ -137,26 +117,32 @@ def favicon():
 
 @app.route('/login')
 def login():
-    p = oauth.remote_apps['google']
-    return p.authorize(callback=url_for('login_authorized_google'))
+    return flask.redirect(flask.url_for('oauth2callback'))
 
 @app.route('/logout')
 def logout():
-    return redirect(url_for('index'))
+    return flask.redirect(flask.url_for('index'))
 
-@app.route('/login_authorized_google')
-@google.authorized_handler
-def login_authorized_google(resp):
-    if resp is None:
-        return redirect(url_for('index'))
+@app.route('/oauth2callback')
+def oauth2callback(): 
+    flow = client.flow_from_clientsecrets(
+        'client_secrets.json',
+        scope='https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+        redirect_uri=flask.url_for('oauth2callback', _external=True),)
+
+    if 'code' not in flask.request.args:
+        auth_uri = flow.step1_get_authorize_url()
+        return flask.redirect(auth_uri)
     else:
-        g.user = (resp['oauth_token'], resp['oauth_token_secret'])
-        resp = google.get('https://www.googleapis.com/oauth2/v1/userinfo?alt=json')
-        return __on_login('google', resp.data['id'], resp.data['name'], resp.data['email'])
-
-@google.tokengetter
-def get_oauth_token_google():
-    return g.user
+        auth_code = flask.request.args.get('code')
+        credentials = flow.step2_exchange(auth_code)
+        if credentials.access_token_expired:
+            return flask.redirect(flask.url_for('oauth2callback'))
+        else:
+            http_auth = credentials.authorize(httplib2.Http())
+            users_service = discovery.build('oauth2', 'v2', http=http_auth)
+            user_info = users_service.userinfo().get().execute()
+            return __on_login('google', user_info['id'], user_info['name'], user_info['email'])        
 
 #################################################################
 # misc private #
@@ -164,7 +150,6 @@ def get_oauth_token_google():
 def __authenticated(request_data):
     data = json.loads(request_data)
     #if (data.get('method') != 'barrister-idl'):
-
     return True
 
 def __on_login(provider, provider_user_id, name, email):
@@ -173,7 +158,7 @@ def __on_login(provider, provider_user_id, name, email):
     user         = projectService.get_user_settings(login_info.get('access_token'))
     url          = '#/private/%s/%s' % (login_info.get('access_token'), user['default_language'] or '')
 
-    return redirect(url_for('index') + url);
+    return flask.redirect(flask.url_for('index') + url);
 
 def __host_file(file):
     file_uri = hosting_service.host_file(file)
