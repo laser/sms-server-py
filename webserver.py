@@ -24,6 +24,21 @@ app.secret_key = dict_get(os.environ, 'SMS_FLASK_SECRET_KEY')
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
 #################################################################
+# oauth config #
+################
+
+with open('client_secrets.json', 'w') as outfile:
+    json.dump({
+        'web': {
+        'client_id': dict_get(os.environ, 'SMS_GOOGLE_LOGIN_CLIENT_ID'),
+        'client_secret': dict_get(os.environ, 'SMS_GOOGLE_LOGIN_CLIENT_SECRET'),
+        'redirect_uris': ['https://www.simplemappingsystem.com/oauth2callback'],
+        'auth_uri': 'https://accounts.google.com/o/oauth2/auth',
+        'token_uri': 'https://accounts.google.com/o/oauth2/token'
+        }
+    }, outfile)
+
+#################################################################
 # app config #
 ##############
 
