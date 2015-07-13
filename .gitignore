@@ -6,8 +6,6 @@ run.sh
 *.iml
 .idea
 
-sms.html
-sms.json
 sql/build.sh
 .Python
 bin/
