@@ -342,7 +342,12 @@ class Repository():
         """
         params = [access_token]
 
-        return self.db.selectRow(sql, params)
+        user =  self.db.selectRow(sql, params)
+
+        if user is None:
+            raise Exception('Cannot get user by access token ' + access_token)
+        else:
+            return user
 
     def get_position_field_types(self, project_id):
         sql = """
