@@ -24,7 +24,6 @@ class Db:
         self._test_process_time = 0
         self.connect()
         self.verbose = False
-        self.commit()
 
     def close(self):
         self.conn.close()
@@ -37,6 +36,7 @@ class Db:
                                     db=self.dbname,
                                     cursorclass=MySQLdb.cursors.DictCursor,
                                     use_unicode=self.use_unicode)
+        self.conn.autocommit(True)
 
     def testConnAndRefreshIfNecessary(self):
         # refresh every 15 seconds
@@ -48,9 +48,6 @@ class Db:
         except:
             self.log.info("Refreshing connection to db")
             self.connect()
-
-    def commit(self):
-        self.conn.commit()
 
     def selectRow(self, sql, params=None):
         self.testConnAndRefreshIfNecessary()
@@ -81,7 +78,6 @@ class Db:
             self.log.debug("%s - params: %s" % (sql, str(params)))
         cursor.execute(sql, params)
         rowsAffected = cursor.rowcount
-        self.commit()
         cursor.close()
         return rowsAffected
 
@@ -92,7 +88,6 @@ class Db:
             self.log.debug("%s - params: %s" % (sql, str(params)))
         cursor.execute(sql, params)
         newId = cursor.lastrowid
-        self.commit()
         cursor.close()
         return newId
 
