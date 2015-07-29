@@ -1,0 +1,2 @@
+ALTER TABLE `logins` MODIFY COLUMN access_token VARCHAR(128);
+ALTER IGNORE TABLE `logins` ADD UNIQUE (user_id);

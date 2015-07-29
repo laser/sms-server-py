@@ -146,7 +146,8 @@ def oauth2callback():
             http_auth = credentials.authorize(httplib2.Http())
             users_service = discovery.build('oauth2', 'v2', http=http_auth)
             user_info = users_service.userinfo().get().execute()
-            return __on_login('google', user_info['id'], user_info['name'], user_info['email'])        
+
+            return __on_login('google', credentials.access_token, user_info['id'], user_info['name'], user_info['email'])        
 
 #################################################################
 # misc private #
@@ -156,9 +157,9 @@ def __authenticated(request_data):
     #if (data.get('method') != 'barrister-idl'):
     return True
 
-def __on_login(provider, provider_user_id, name, email):
+def __on_login(provider, access_token, provider_user_id, name, email):
     user_id      = '%s-%s' % (provider, provider_user_id)
-    login_info   = authService.login(user_id, email, name)
+    login_info   = authService.login(access_token, user_id, email, name)
     user         = projectService.get_user_settings(login_info.get('access_token'))
     url          = '#/private/%s/%s' % (login_info.get('access_token'), user['default_language'] or '')
 

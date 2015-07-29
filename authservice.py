@@ -20,7 +20,7 @@ class AuthService():
     # public methods #
     ##################
 
-    def login(self, user_id, email, name):
+    def login(self, access_token, user_id, email, name):
 
         # update user record with email and name
         sql = """
@@ -42,19 +42,20 @@ class AuthService():
             email = %s"""
         params = [user_id, email]
 
-        # generate an access token
-        token_id = uuid.uuid4()
+        # save the access token
         expiry_time = now_millis() + self.token_ttl_millis
         sql = """
+
         INSERT INTO
-            `logins` (access_token, user_id, expiry_time)
+            `logins` (access_token, user_id, expiry_time) 
         VALUES
             (%s, %s, %s)
+        ON DUPLICATE KEY UPDATE access_token=%s;
         """
-        params = [token_id, user_id, expiry_time]
+        params = [access_token, user_id, expiry_time, access_token]
         self.db.execute(sql, params)
 
         return {
-            "access_token": token_id,
+            "access_token": access_token,
             "expiry_time": expiry_time
         }
