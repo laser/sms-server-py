@@ -61,14 +61,6 @@ smtp_server   = dict_get(os.environ, 'SMS_SMTP_SERVER')
 smtp_port     = dict_get(os.environ, 'SMS_SMTP_PORT')
 
 #################################################################
-# rackspace cloud files #
-#########################
-
-cloud_user           = dict_get(os.environ, 'SMS_CLOUDFILES_USER')
-cloud_api_key        = dict_get(os.environ, 'SMS_CLOUDFILES_API_KEY')
-cloud_container_name = dict_get(os.environ, 'SMS_CLOUDFILES_CONTAINER_NAME')
-
-#################################################################
 # services #
 ############
 
@@ -87,7 +79,7 @@ if environment == 'test':
 else:
     from smtpservice import SMTPService
     from cloud import CloudFilesService
-    hosting_service = CloudFilesService(cloud_user, cloud_api_key, cloud_container_name)
+    hosting_service = CloudFilesService()
     mail_service    = SMTPService(smtp_user, smtp_password, smtp_server, smtp_port)
 
 db             = Db(db_url)
