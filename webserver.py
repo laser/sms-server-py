@@ -32,7 +32,7 @@ with open('client_secrets.json', 'w') as outfile:
         'web': {
         'client_id': dict_get(os.environ, 'SMS_GOOGLE_LOGIN_CLIENT_ID'),
         'client_secret': dict_get(os.environ, 'SMS_GOOGLE_LOGIN_CLIENT_SECRET'),
-        'redirect_uris': ['https://www.simplemappingsystem.com/oauth2callback'],
+        'redirect_uris': ['http://www.simplemappingsystem.com/oauth2callback', 'http://simplemappingsystem.com/oauth2callback'],
         'auth_uri': 'https://accounts.google.com/o/oauth2/auth',
         'token_uri': 'https://accounts.google.com/o/oauth2/token'
         }
@@ -132,7 +132,7 @@ def oauth2callback():
     flow = client.flow_from_clientsecrets(
         'client_secrets.json',
         scope='https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
-        redirect_uri=flask.url_for('oauth2callback', _external=True),)
+        redirect_uri=flask.url_for('oauth2callback', _external=True))
 
     if 'code' not in flask.request.args:
         auth_uri = flow.step1_get_authorize_url()
