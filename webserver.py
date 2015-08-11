@@ -174,8 +174,5 @@ def __host_file(file):
 # main #
 ########
 
-if environment != 'dev' and environment != 'test':
-    sslify = SSLify(app)
-
 if __name__ == '__main__':
     app.run()
