@@ -5,6 +5,7 @@ boto==2.38.0
 botocore==1.1.4
 docutils==0.12
 Flask==0.10.1
+Flask-SSLify==0.1.5
 futures==2.2.0
 google-api-python-client==1.4.1
 gunicorn==19.3.0

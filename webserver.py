@@ -5,6 +5,7 @@ from utilities import dict_get
 from oauth2client import client
 from apiclient import discovery
 from werkzeug.contrib.fixers import ProxyFix
+from flask_sslify import SSLify
 
 import os
 import barrister
@@ -172,6 +173,9 @@ def __host_file(file):
 #################################################################
 # main #
 ########
+
+if environment != 'dev' and environment != 'test':
+    sslify = SSLify(app)
 
 if __name__ == '__main__':
     app.run()
