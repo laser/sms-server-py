@@ -5,7 +5,6 @@ from utilities import dict_get
 from oauth2client import client
 from apiclient import discovery
 from werkzeug.contrib.fixers import ProxyFix
-from flask_sslify import SSLify
 
 import os
 import barrister
