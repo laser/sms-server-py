@@ -159,8 +159,7 @@ def __authenticated(request_data):
     return True
 
 def __on_login(provider, access_token, provider_user_id, name, email):
-    user_id      = '%s-%s' % (provider, provider_user_id)
-    login_info   = authService.login(access_token, user_id, email, name)
+    login_info   = authService.login(access_token, provider_user_id, email, name)
     user         = projectService.get_user_settings(login_info.get('access_token'))
     url          = '#/private/%s/%s' % (login_info.get('access_token'), user['default_language'] or '')
 
